@@ -1132,6 +1132,9 @@ body {
   </div>
 
   <div class="sec-title" style="margin-bottom:12px">코인별 WIN RATE</div>
+  <div class="filter-tabs" id="dashCoinTabs" style="margin-bottom:12px">
+    <button class="filter-tab active" onclick="setDashCoin('all',this)">전체</button>
+  </div>
   <div class="card" style="margin-bottom:16px">
     <div style="padding:16px" id="coinChart">
       <div class="empty" style="padding:20px"><div class="empty-ico" style="font-size:1.8em">📊</div><div class="empty-txt">데이터 없음</div></div>
@@ -1374,6 +1377,12 @@ function renderHistory() {
       ? `${t.sl.toLocaleString()}${t.slGap !== null ? ` (${t.slGap.toFixed(1)}%)` : ''}`
       : '—';
 
+    const pnl    = (t.exit && t.entry && t.amount) ? (t.exit - t.entry) * t.amount : null;
+    const roi    = (t.exit && t.entry) ? (t.exit - t.entry) / t.entry * 100 : null;
+    const pnlTxt = pnl !== null ? `${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}` : '—';
+    const roiTxt = roi !== null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%` : '—';
+    const pnlCls = pnl !== null ? (pnl >= 0 ? 'green' : 'red') : '';
+
     const imgHtml = t.imgs && t.imgs.length
       ? `<div class="tc-imgs">${t.imgs.map(s => `<img class="ss-thumb" src="${s}" onclick="openImg('${s}')">`).join('')}</div>`
       : '';
@@ -1422,6 +1431,18 @@ function renderHistory() {
           <div class="info-item">
             <div class="info-label">청산일</div>
             <div class="info-value" style="font-size:0.78em">${t.xDate || '—'}</div>
+          </div>
+          <div class="info-item" style="border-top:1px solid var(--border)">
+            <div class="info-label">P&L</div>
+            <div class="info-value ${pnlCls}">${pnlTxt}</div>
+          </div>
+          <div class="info-item" style="border-top:1px solid var(--border)">
+            <div class="info-label">ROI</div>
+            <div class="info-value ${pnlCls}">${roiTxt}</div>
+          </div>
+          <div class="info-item" style="border-top:1px solid var(--border)">
+            <div class="info-label">수량</div>
+            <div class="info-value">${t.amount || '—'}</div>
           </div>
         </div>
         ${reasonHtml}
@@ -1515,6 +1536,99 @@ function delTrade(id) {
 }
 
 // ── DASHBOARD ──
+let dashCoin = 'all';
+
+function setDashCoin(c, btn) {
+  dashCoin = c;
+  document.querySelectorAll('#dashCoinTabs .filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCoinChart();
+}
+
+function renderCoinChart() {
+  const done = trades.filter(t => t.result !== 'ACTIVE');
+
+  if (dashCoin === 'all') {
+    // 전체: 코인별 WIN RATE 바 차트
+    const byCoin = {};
+    done.forEach(t => {
+      if (!byCoin[t.coin]) byCoin[t.coin] = { w:0, n:0, d:0, l:0 };
+      byCoin[t.coin].n++;
+      if (t.result === 'WIN')  byCoin[t.coin].w++;
+      if (t.result === 'DRAW') byCoin[t.coin].d++;
+      if (t.result === 'LOSE') byCoin[t.coin].l++;
+    });
+    const coinEntries = Object.entries(byCoin).sort((a,b) => b[1].w/b[1].n - a[1].w/a[1].n);
+    document.getElementById('coinChart').innerHTML = coinEntries.length
+      ? coinEntries.map(([c, v]) => {
+          const wr2 = v.w / v.n * 100;
+          return `<div class="bar-row">
+            <div class="bar-sym">${c}</div>
+            <div class="bar-track"><div class="bar-fill ${wr2 < 40 ? 'neg' : ''}" style="width:${wr2}%"></div></div>
+            <div class="bar-val ${wr2>=50?'pos':'neg'}">${wr2.toFixed(0)}%</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:0.6em;color:var(--text-3);padding:0 0 8px 58px">${v.w}W / ${v.d}D / ${v.l}L · ${v.n}거래</div>`;
+        }).join('')
+      : '<div class="empty" style="padding:20px"><div class="empty-ico" style="font-size:1.8em">📊</div><div class="empty-txt">데이터 없음</div></div>';
+  } else {
+    // 특정 코인: 해당 코인 상세 통계
+    const coinTrades = done.filter(t => t.coin === dashCoin);
+    if (!coinTrades.length) {
+      document.getElementById('coinChart').innerHTML =
+        '<div class="empty" style="padding:20px"><div class="empty-ico" style="font-size:1.8em">📊</div><div class="empty-txt">해당 코인 데이터 없음</div></div>';
+      return;
+    }
+    const wins  = coinTrades.filter(t => t.result === 'WIN').length;
+    const loses = coinTrades.filter(t => t.result === 'LOSE').length;
+    const draws = coinTrades.filter(t => t.result === 'DRAW').length;
+    const wr2   = (wins / coinTrades.length * 100).toFixed(0);
+
+    // 장세별 성과
+    const byMkt2 = {};
+    coinTrades.forEach(t => {
+      if (!t.market) return;
+      if (!byMkt2[t.market]) byMkt2[t.market] = { w:0, n:0 };
+      byMkt2[t.market].n++;
+      if (t.result === 'WIN') byMkt2[t.market].w++;
+    });
+
+    // LONG/SHORT 성과
+    const byLS = {};
+    coinTrades.forEach(t => {
+      const k = t.ls || 'LONG';
+      if (!byLS[k]) byLS[k] = { w:0, n:0 };
+      byLS[k].n++;
+      if (t.result === 'WIN') byLS[k].w++;
+    });
+
+    document.getElementById('coinChart').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+        <div class="info-item"><div class="info-label">총 거래</div><div class="info-value">${coinTrades.length}</div></div>
+        <div class="info-item"><div class="info-label">WIN RATE</div><div class="info-value ${parseInt(wr2)>=50?'green':'red'}">${wr2}%</div></div>
+        <div class="info-item"><div class="info-label">W/D/L</div><div class="info-value">${wins}/${draws}/${loses}</div></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:0.62em;letter-spacing:2px;color:var(--orange);margin-bottom:8px">장세별 승률</div>
+      ${Object.entries(byMkt2).map(([m, v]) => {
+        const wr3 = v.w / v.n * 100;
+        return `<div class="bar-row">
+          <div class="bar-sym" style="width:60px;font-size:0.65em">${m}</div>
+          <div class="bar-track"><div class="bar-fill ${wr3<40?'neg':''}" style="width:${wr3}%"></div></div>
+          <div class="bar-val ${wr3>=50?'pos':'neg'}">${wr3.toFixed(0)}%</div>
+        </div>`;
+      }).join('') || '<div style="color:var(--text-3);font-size:0.8em;padding:4px 0">데이터 없음</div>'}
+      <div style="font-family:var(--mono);font-size:0.62em;letter-spacing:2px;color:var(--orange);margin:12px 0 8px">LONG / SHORT 승률</div>
+      ${Object.entries(byLS).map(([ls, v]) => {
+        const wr3 = v.w / v.n * 100;
+        return `<div class="bar-row">
+          <div class="bar-sym" style="width:60px;font-size:0.65em;color:${ls==='LONG'?'var(--green)':'var(--red)'}">${ls}</div>
+          <div class="bar-track"><div class="bar-fill ${wr3<40?'neg':''}" style="width:${wr3}%"></div></div>
+          <div class="bar-val ${wr3>=50?'pos':'neg'}">${wr3.toFixed(0)}%</div>
+        </div>`;
+      }).join('') || '<div style="color:var(--text-3);font-size:0.8em;padding:4px 0">데이터 없음</div>'}
+    `;
+  }
+}
+
 function renderDash() {
   const done  = trades.filter(t => t.result !== 'ACTIVE');
   const wins  = done.filter(t => t.result === 'WIN').length;
@@ -1523,31 +1637,22 @@ function renderDash() {
   const wr    = done.length ? (wins / done.length * 100).toFixed(0) : null;
   const act   = trades.filter(t => t.result === 'ACTIVE').length;
 
-  document.getElementById('dTotal').textContent    = trades.length;
+  document.getElementById('dTotal').textContent     = trades.length;
   document.getElementById('dActiveSub').textContent = `진행중 ${act}`;
-  document.getElementById('dWr').textContent       = wr ? wr + '%' : '— %';
-  document.getElementById('dWrSub').textContent    = `${wins}W / ${loses}L / ${draws}D`;
-  document.getElementById('dWin').textContent      = wins;
-  document.getElementById('dLose').textContent     = loses;
+  document.getElementById('dWr').textContent        = wr ? wr + '%' : '— %';
+  document.getElementById('dWrSub').textContent     = `${wins}W / ${loses}L / ${draws}D`;
+  document.getElementById('dWin').textContent       = wins;
+  document.getElementById('dLose').textContent      = loses;
 
-  // 코인별 승률
-  const byCoin = {};
-  done.forEach(t => {
-    if (!byCoin[t.coin]) byCoin[t.coin] = { w:0, n:0 };
-    byCoin[t.coin].n++;
-    if (t.result === 'WIN') byCoin[t.coin].w++;
-  });
-  const coinEntries = Object.entries(byCoin).sort((a,b) => b[1].w/b[1].n - a[1].w/a[1].n);
-  document.getElementById('coinChart').innerHTML = coinEntries.length
-    ? coinEntries.map(([c, v]) => {
-        const wr2 = v.w / v.n * 100;
-        return `<div class="bar-row">
-          <div class="bar-sym">${c}</div>
-          <div class="bar-track"><div class="bar-fill ${wr2 < 40 ? 'neg' : ''}" style="width:${wr2}%"></div></div>
-          <div class="bar-val ${wr2>=50?'pos':'neg'}">${wr2.toFixed(0)}%</div>
-        </div>`;
-      }).join('')
-    : '<div class="empty" style="padding:20px"><div class="empty-ico" style="font-size:1.8em">📊</div><div class="empty-txt">데이터 없음</div></div>';
+  // 코인 탭 버튼 동적 생성
+  const tradedCoins = [...new Set(done.map(t => t.coin))];
+  const tabsEl = document.getElementById('dashCoinTabs');
+  tabsEl.innerHTML = `<button class="filter-tab ${dashCoin==='all'?'active':''}" onclick="setDashCoin('all',this)">전체</button>`
+    + tradedCoins.map(c =>
+        `<button class="filter-tab ${dashCoin===c?'active':''}" onclick="setDashCoin('${c}',this)">${c}</button>`
+      ).join('');
+
+  renderCoinChart();
 
   // 장세별 승률
   const byMkt = {};
