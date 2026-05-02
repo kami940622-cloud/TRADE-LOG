@@ -970,43 +970,7 @@ body {
 </div>
 
 <!-- TICKER BAR -->
-<div style="background:#000;border-bottom:1px solid var(--border);padding:0 16px;height:36px;display:flex;align-items:center;gap:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none">
-  <style>.ticker-bar::-webkit-scrollbar{display:none}</style>
-  <div style="display:flex;align-items:center;gap:20px;flex-shrink:0">
-    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;flex-shrink:0">
-      <span style="font-family:var(--mono);font-size:0.58em;color:var(--orange);font-weight:600;letter-spacing:1px">BTC/USDT</span>
-      <div style="display:flex;align-items:center;gap:5px">
-        <span style="font-family:var(--mono);font-size:0.72em;color:var(--text-2)" id="tick-price-0">로딩중...</span>
-        <span style="font-family:var(--mono);font-size:0.6em;color:var(--text-3)" id="tick-change-0"></span>
-      </div>
-    </div>
-    <div style="width:1px;height:20px;background:var(--border2);flex-shrink:0"></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;flex-shrink:0">
-      <span style="font-family:var(--mono);font-size:0.58em;color:var(--orange);font-weight:600;letter-spacing:1px">ETH/USDT</span>
-      <div style="display:flex;align-items:center;gap:5px">
-        <span style="font-family:var(--mono);font-size:0.72em;color:var(--text-2)" id="tick-price-1">로딩중...</span>
-        <span style="font-family:var(--mono);font-size:0.6em;color:var(--text-3)" id="tick-change-1"></span>
-      </div>
-    </div>
-    <div style="width:1px;height:20px;background:var(--border2);flex-shrink:0"></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;flex-shrink:0">
-      <span style="font-family:var(--mono);font-size:0.58em;color:var(--orange);font-weight:600;letter-spacing:1px">XRP/USDT</span>
-      <div style="display:flex;align-items:center;gap:5px">
-        <span style="font-family:var(--mono);font-size:0.72em;color:var(--text-2)" id="tick-price-2">로딩중...</span>
-        <span style="font-family:var(--mono);font-size:0.6em;color:var(--text-3)" id="tick-change-2"></span>
-      </div>
-    </div>
-    <div style="width:1px;height:20px;background:var(--border2);flex-shrink:0"></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;flex-shrink:0">
-      <span style="font-family:var(--mono);font-size:0.58em;color:var(--orange);font-weight:600;letter-spacing:1px">SOL/USDT</span>
-      <div style="display:flex;align-items:center;gap:5px">
-        <span style="font-family:var(--mono);font-size:0.72em;color:var(--text-2)" id="tick-price-3">로딩중...</span>
-        <span style="font-family:var(--mono);font-size:0.6em;color:var(--text-3)" id="tick-change-3"></span>
-      </div>
-    </div>
-    <div style="width:1px;height:20px;background:var(--border2);flex-shrink:0"></div>
-    <span style="font-family:var(--mono);font-size:0.55em;color:var(--text-3);letter-spacing:1px;flex-shrink:0">60초 갱신 · CoinGecko</span>
-  </div>
+<div id="tickerBar" style="background:#000;border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch">
 </div>
 
 <div class="main">
@@ -1300,6 +1264,7 @@ function addCoin() {
   if (!v || coins.includes(v)) { inp.value = ''; return; }
   coins.push(v); saveCoins(); inp.value = '';
   renderCoins(); pickCoin(v);
+  renderTickerBar(); fetchPrices();
 }
 
 function delCoin(e, c) {
@@ -1307,6 +1272,7 @@ function delCoin(e, c) {
   coins = coins.filter(x => x !== c); saveCoins();
   if (selCoin === c) pickCoin(coins[0] || 'BTC');
   renderCoins();
+  renderTickerBar(); fetchPrices();
 }
 
 document.addEventListener('click', e => {
@@ -1781,17 +1747,62 @@ function setNow(fieldId) {
   el.value = local;
 }
 
-// ── BINANCE 실시간 가격 ──
-const GECKO_IDS = ['bitcoin','ethereum','ripple','solana'];
+// ── 실시간 가격 ──
+// 심볼 → CoinGecko ID 매핑 테이블 (50종)
+const COIN_ID_MAP = {
+  BTC:'bitcoin', ETH:'ethereum', XRP:'ripple', SOL:'solana',
+  BNB:'binancecoin', ADA:'cardano', DOGE:'dogecoin', TRX:'tron',
+  AVAX:'avalanche-2', DOT:'polkadot', LINK:'chainlink', TON:'the-open-network',
+  MATIC:'matic-network', SHIB:'shiba-inu', LTC:'litecoin', BCH:'bitcoin-cash',
+  UNI:'uniswap', XLM:'stellar', ATOM:'cosmos', ETC:'ethereum-classic',
+  ICP:'internet-computer', FIL:'filecoin', NEAR:'near', APT:'aptos',
+  ARB:'arbitrum', OP:'optimism', MKR:'maker', AAVE:'aave',
+  GRT:'the-graph', SAND:'the-sandbox', MANA:'decentraland', AXS:'axie-infinity',
+  CRV:'curve-dao-token', SNX:'synthetix-network-token', COMP:'compound-governance-token',
+  LDO:'lido-dao', RPL:'rocket-pool', FTM:'fantom', ALGO:'algorand',
+  VET:'vechain', HBAR:'hedera-hashgraph', EGLD:'elrond-erd-2', THETA:'theta-token',
+  XMR:'monero', ZEC:'zcash', DASH:'dash', EOS:'eos',
+  NEO:'neo', WAVES:'waves', KLAY:'klay-token'
+};
 
-async function fetchOneCoin(symbol, idx) {
+// ticker bar 동적 렌더링
+function renderTickerBar() {
+  const bar = document.getElementById('tickerBar');
+  if (!bar) return;
+
+  // 기본 4종 + 사용자 추가 코인 (DEFAULT 제외한 추가분)
+  const baseCoin  = ['BTC','ETH','XRP','SOL'];
+  const extraCoins = coins.filter(c => !baseCoin.includes(c));
+  const allTickers = [...baseCoin, ...extraCoins];
+
+  bar.innerHTML = allTickers.map((sym, i) => `
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;flex-shrink:0;padding:0 14px 0 ${i===0?'0':'14px'};border-left:${i===0?'none':'1px solid var(--border2)'}" id="tick-wrap-${i}">
+      <span style="font-family:var(--mono);font-size:0.68em;color:var(--orange);font-weight:700;letter-spacing:1px">${sym}/USDT</span>
+      <div style="display:flex;align-items:baseline;gap:6px">
+        <span style="font-family:var(--mono);font-size:0.95em;font-weight:600;color:var(--text-2)" id="tick-price-${i}">···</span>
+        <span style="font-family:var(--mono);font-size:0.68em;color:var(--text-3)" id="tick-change-${i}"></span>
+      </div>
+    </div>`).join('') +
+    `<span style="font-family:var(--mono);font-size:0.6em;color:var(--text-3);letter-spacing:1px;flex-shrink:0;padding-left:16px;border-left:1px solid var(--border2);margin-left:14px;white-space:nowrap">60s · CoinGecko</span>`;
+
+  // 심볼 리스트 저장 (fetch에서 사용)
+  window._tickerSymbols = allTickers;
+}
+
+async function fetchOneCoin(sym, idx) {
+  const geckoId = COIN_ID_MAP[sym.toUpperCase()];
+  if (!geckoId) {
+    const priceEl = document.getElementById(`tick-price-${idx}`);
+    if (priceEl) { priceEl.textContent = '—'; priceEl.style.color = 'var(--text-3)'; }
+    return;
+  }
   try {
-    const res = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${symbol}&vs_currencies=usd&include_24hr_change=true`,
+    const res  = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${geckoId}&vs_currencies=usd&include_24hr_change=true`,
       { headers: { 'Accept': 'application/json' } }
     );
     const data = await res.json();
-    const info = data[symbol];
+    const info = data[geckoId];
     if (!info) return;
     const priceEl  = document.getElementById(`tick-price-${idx}`);
     const changeEl = document.getElementById(`tick-change-${idx}`);
@@ -1802,7 +1813,7 @@ async function fetchOneCoin(symbol, idx) {
       minimumFractionDigits: 2,
       maximumFractionDigits: price < 1 ? 4 : 2
     });
-    priceEl.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
+    priceEl.style.color  = change >= 0 ? 'var(--green)' : 'var(--red)';
     if (changeEl) {
       changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
       changeEl.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
@@ -1811,12 +1822,14 @@ async function fetchOneCoin(symbol, idx) {
 }
 
 async function fetchPrices() {
-  GECKO_IDS.forEach((id, idx) => fetchOneCoin(id, idx));
+  const syms = window._tickerSymbols || ['BTC','ETH','XRP','SOL'];
+  syms.forEach((sym, idx) => fetchOneCoin(sym, idx));
 }
 
 // ── INIT ──
 setNow('fEntryDate');
 renderCoins();
+renderTickerBar();
 updateHeader();
 fetchPrices();
 setInterval(fetchPrices, 60000);
