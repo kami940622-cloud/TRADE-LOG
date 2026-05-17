@@ -272,6 +272,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .pos{color:var(--green)!important}
 .neg{color:var(--red)!important}
 .ora{color:var(--orange)!important}
+
+/* CALC */
+.calc-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.calc-box.g{background:rgba(48,209,88,.04);border-color:rgba(48,209,88,.15)}
+.calc-box.r{background:rgba(255,69,58,.04);border-color:rgba(255,69,58,.15)}
+.calc-box.b{background:rgba(10,132,255,.04);border-color:rgba(10,132,255,.15)}
+.calc-label{font-family:var(--mono);font-size:.55em;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:5px}
+.calc-value{font-family:var(--mono);font-size:.9em;font-weight:700;color:var(--text)}
+.calc-result-row{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.crr-label{font-family:var(--mono);font-size:.65em;color:var(--text-3);letter-spacing:1px}
+.crr-value{font-family:var(--mono);font-size:.9em;font-weight:700}
+.buy-row{display:grid;grid-template-columns:1fr 1fr 36px;gap:6px;margin-bottom:8px;align-items:center}
+.buy-input{background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 10px;height:44px;font-family:var(--mono);font-size:.82em;border-radius:7px;outline:none;width:100%;transition:border-color .15s}
+.buy-input:focus{border-color:var(--orange)}
+.buy-del{background:none;border:1px solid var(--border2);color:var(--text-3);height:36px;width:36px;border-radius:7px;cursor:pointer;font-size:.9em;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.buy-del:active{border-color:var(--red);color:var(--red)}
 </style>
 </head>
 <body>
@@ -463,7 +479,169 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
+<!-- ══ CALC ══ -->
+<div class="page" id="page-calc">
+
+  <!-- 총 시드 -->
+  <div class="card">
+    <div class="card-hd"><span class="card-title">총 시드 (Capital)</span></div>
+    <div style="padding:14px 16px;display:flex;gap:10px;align-items:center">
+      <input type="number" id="cSeed" placeholder="총 보유 자본 (USDT)" inputmode="decimal"
+        oninput="calcAll()"
+        style="flex:1;background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 14px;height:52px;font-family:var(--mono);font-size:.9em;border-radius:8px;outline:none">
+      <div style="font-family:var(--mono);font-size:.72em;color:var(--text-3)">USDT</div>
+    </div>
+  </div>
+
+  <!-- 평단계산기 -->
+  <div class="card">
+    <div class="card-hd">
+      <span class="card-title">평단 계산기</span>
+      <button class="btn btn-ghost btn-sm" onclick="addBuyRow()">+ 추가매수</button>
+    </div>
+    <div style="padding:14px 16px" id="buyRows"></div>
+    <div style="padding:0 16px 14px">
+      <button onclick="addBuyRow()" style="width:100%;height:42px;background:var(--orange-d);border:1px dashed rgba(255,149,0,.4);color:var(--orange);font-family:var(--mono);font-size:.72em;letter-spacing:1px;border-radius:8px;cursor:pointer">+ 매수 추가</button>
+    </div>
+
+    <!-- 평단 결과 -->
+    <div style="border-top:1px solid var(--border);padding:14px 16px;background:rgba(0,0,0,.2)">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px" id="avgResult">
+        <div class="calc-box"><div class="calc-label">평균 단가</div><div class="calc-value ora" id="r-avg">—</div></div>
+        <div class="calc-box"><div class="calc-label">총 수량</div><div class="calc-value" id="r-qty">—</div></div>
+        <div class="calc-box"><div class="calc-label">총 투자금</div><div class="calc-value" id="r-invest">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 수수료 설정 -->
+  <div class="card">
+    <div class="card-hd"><span class="card-title">수수료 설정</span></div>
+    <div style="padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <span style="font-family:var(--mono);font-size:.72em;color:var(--text-3)">거래당 수수료</span>
+      <input type="number" id="cFee" value="0.1" step="0.01" inputmode="decimal" oninput="calcAll()"
+        style="width:80px;background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 10px;height:38px;font-family:var(--mono);font-size:.85em;border-radius:7px;outline:none;text-align:center">
+      <span style="font-family:var(--mono);font-size:.72em;color:var(--text-3)">%</span>
+      <div style="margin-left:auto;font-family:var(--mono);font-size:.65em;color:var(--text-3)">진입+청산 합산: <span id="totalFee" style="color:var(--orange)">0.2%</span></div>
+    </div>
+  </div>
+
+  <!-- 목표가 / 손절가 -->
+  <div class="card">
+    <div class="card-hd"><span class="card-title">목표가 / 손절가</span></div>
+    <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div style="font-family:var(--mono);font-size:.6em;letter-spacing:1.5px;color:var(--green);margin-bottom:6px;text-transform:uppercase">🎯 목표가</div>
+          <input type="number" id="cTarget" placeholder="목표 청산가" inputmode="decimal" oninput="calcAll()"
+            style="width:100%;background:#0d0d0d;border:1px solid rgba(48,209,88,.3);color:var(--text);padding:0 12px;height:48px;font-family:var(--mono);font-size:.88em;border-radius:8px;outline:none">
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:.6em;letter-spacing:1.5px;color:var(--red);margin-bottom:6px;text-transform:uppercase">🔴 손절가</div>
+          <input type="number" id="cStop" placeholder="손절 기준가" inputmode="decimal" oninput="calcAll()"
+            style="width:100%;background:#0d0d0d;border:1px solid rgba(255,69,58,.3);color:var(--text);padding:0 12px;height:48px;font-family:var(--mono);font-size:.88em;border-radius:8px;outline:none">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 계산 결과 -->
+  <div class="card">
+    <div class="card-hd"><span class="card-title">계산 결과</span></div>
+    <div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+
+      <!-- BEP -->
+      <div class="calc-result-row" style="border-color:var(--border2)">
+        <div class="crr-label">손익분기점 (BEP)</div>
+        <div class="crr-value" id="r-bep" style="color:var(--text-2)">—</div>
+      </div>
+
+      <!-- 목표 결과 -->
+      <div style="background:rgba(48,209,88,.05);border:1px solid rgba(48,209,88,.15);border-radius:10px;padding:12px 14px">
+        <div style="font-family:var(--mono);font-size:.62em;letter-spacing:2px;color:var(--green);margin-bottom:10px">🎯 목표 달성 시</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="calc-box g"><div class="calc-label">예상 수익</div><div class="calc-value pos" id="r-tProfit">—</div></div>
+          <div class="calc-box g"><div class="calc-label">수익률</div><div class="calc-value pos" id="r-tRoi">—</div></div>
+          <div class="calc-box g"><div class="calc-label">시드 대비</div><div class="calc-value pos" id="r-tSeed">—</div></div>
+          <div class="calc-box g"><div class="calc-label">R/R 비율</div><div class="calc-value ora" id="r-rr">—</div></div>
+        </div>
+      </div>
+
+      <!-- 손절 결과 -->
+      <div style="background:rgba(255,69,58,.05);border:1px solid rgba(255,69,58,.15);border-radius:10px;padding:12px 14px">
+        <div style="font-family:var(--mono);font-size:.62em;letter-spacing:2px;color:var(--red);margin-bottom:10px">🔴 손절 시</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="calc-box r"><div class="calc-label">최대 손실</div><div class="calc-value neg" id="r-sLoss">—</div></div>
+          <div class="calc-box r"><div class="calc-label">손실률</div><div class="calc-value neg" id="r-sRoi">—</div></div>
+          <div class="calc-box r"><div class="calc-label">시드 대비</div><div class="calc-value neg" id="r-sSeed">—</div></div>
+          <div class="calc-box r"><div class="calc-label">청산가</div><div class="calc-value neg" id="r-sExit">—</div></div>
+        </div>
+      </div>
+
+      <!-- 포지션 사이징 + 고정손실 + 레버리지 -->
+      <div style="background:rgba(10,132,255,.05);border:1px solid rgba(10,132,255,.15);border-radius:10px;padding:12px 14px">
+        <div style="font-family:var(--mono);font-size:.62em;letter-spacing:2px;color:var(--blue);margin-bottom:10px">📐 포지션 사이징 / 고정손실 계산</div>
+
+        <!-- 모드 선택 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--border2);margin-bottom:12px;height:38px">
+          <button id="modeRisk" onclick="setPsMode('risk')"
+            style="background:var(--blue);color:#fff;border:none;font-family:var(--mono);font-size:.7em;font-weight:700;letter-spacing:1px;cursor:pointer;border-right:1px solid var(--border2)">
+            % 리스크 방식
+          </button>
+          <button id="modeFixed" onclick="setPsMode('fixed')"
+            style="background:#0d0d0d;color:var(--text-3);border:none;font-family:var(--mono);font-size:.7em;font-weight:700;letter-spacing:1px;cursor:pointer">
+            고정 손실 방식
+          </button>
+        </div>
+
+        <!-- % 리스크 방식 -->
+        <div id="psRiskMode">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="font-family:var(--mono);font-size:.65em;color:var(--text-3)">허용 리스크</span>
+            <input type="number" id="cRisk" value="2" step="0.5" min="0.1" max="100" inputmode="decimal" oninput="calcAll()"
+              style="width:70px;background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 8px;height:36px;font-family:var(--mono);font-size:.82em;border-radius:6px;outline:none;text-align:center">
+            <span style="font-family:var(--mono);font-size:.65em;color:var(--text-3)">% (시드 대비)</span>
+          </div>
+        </div>
+
+        <!-- 고정 손실 방식 -->
+        <div id="psFixedMode" style="display:none">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span style="font-family:var(--mono);font-size:.65em;color:var(--text-3)">허용 손실 금액</span>
+            <input type="number" id="cFixedLoss" placeholder="1000" inputmode="decimal" oninput="calcAll()"
+              style="flex:1;background:#0d0d0d;border:1px solid rgba(255,69,58,.35);color:var(--text);padding:0 10px;height:36px;font-family:var(--mono);font-size:.82em;border-radius:6px;outline:none">
+            <span style="font-family:var(--mono);font-size:.65em;color:var(--text-3)">USDT</span>
+          </div>
+        </div>
+
+        <!-- 레버리지 입력 (선물용) -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:rgba(0,0,0,.3);border-radius:7px">
+          <span style="font-family:var(--mono);font-size:.65em;color:var(--text-3)">레버리지</span>
+          <input type="number" id="cLeverage" value="1" min="1" max="125" step="1" inputmode="decimal" oninput="calcAll()"
+            style="width:60px;background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 8px;height:34px;font-family:var(--mono);font-size:.82em;border-radius:6px;outline:none;text-align:center">
+          <span style="font-family:var(--mono);font-size:.65em;color:var(--text-3)">배</span>
+          <span style="font-family:var(--mono);font-size:.6em;color:var(--text-3);margin-left:4px">※ 현물은 1배</span>
+        </div>
+
+        <!-- 결과 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="calc-box b"><div class="calc-label">허용 손실금액</div><div class="calc-value neg" id="r-fixedAmt">—</div></div>
+          <div class="calc-box b"><div class="calc-label">적정 투자금</div><div class="calc-value blu" id="r-pSize">—</div></div>
+          <div class="calc-box b"><div class="calc-label">적정 수량</div><div class="calc-value blu" id="r-pQty">—</div></div>
+          <div class="calc-box b"><div class="calc-label">레버리지 배율</div><div class="calc-value ora" id="r-lev">—</div></div>
+          <div class="calc-box b" style="grid-column:span 2"><div class="calc-label">🔴 강제청산가 (선물)</div><div class="calc-value neg" id="r-liqPrice">—</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 초기화 -->
+  <button onclick="resetCalc()" style="width:100%;height:44px;background:none;border:1px solid var(--border2);color:var(--text-3);font-family:var(--mono);font-size:.72em;letter-spacing:1.5px;border-radius:10px;cursor:pointer;margin-bottom:14px">초기화</button>
+
 </div>
+
+</div><!-- /main -->
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
@@ -471,6 +649,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <button class="nav-btn" onclick="goPage('history',this)"><span class="nav-icon">📋</span>HISTORY</button>
   <button class="nav-btn" onclick="goPage('dash',this)"><span class="nav-icon">📊</span>DASH</button>
   <button class="nav-btn" onclick="goPage('weekly',this)"><span class="nav-icon">📅</span>WEEKLY</button>
+  <button class="nav-btn" onclick="goPage('calc',this)"><span class="nav-icon">🧮</span>CALC</button>
 </div>
 
 <!-- IMG MODAL -->
@@ -1220,33 +1399,128 @@ function connectWS() {
   if (ws) { try { ws.close(); } catch(e) {} }
 
   const streams = syms.map(s => `${s}@ticker`).join('/');
-  ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
 
-  ws.onopen = () => {
+  // 대체 주소 순서대로 시도
+  const WS_URLS = [
+    `wss://data-stream.binance.com/stream?streams=${streams}`,
+    `wss://stream.binance.com:9443/stream?streams=${streams}`,
+    `wss://stream.binance.com:443/stream?streams=${streams}`
+  ];
+
+  let urlIdx = window._wsUrlIdx || 0;
+  window._wsUrlIdx = urlIdx;
+
+  const tryConnect = (idx) => {
+    if (idx >= WS_URLS.length) {
+      // 모든 WS 주소 실패 → CoinGecko 폴백
+      const st = document.getElementById('wsStatus');
+      if (st) { st.textContent = '● 60s 갱신'; st.style.color = 'var(--text-3)'; }
+      startCoinGeckoFallback();
+      return;
+    }
+
+    ws = new WebSocket(WS_URLS[idx]);
+
+    // 5초 안에 연결 안 되면 다음 주소 시도
+    const timeout = setTimeout(() => {
+      try { ws.close(); } catch(e) {}
+      tryConnect(idx + 1);
+    }, 5000);
+
+    ws.onopen = () => {
+      clearTimeout(timeout);
+      window._wsUrlIdx = idx; // 성공한 주소 기억
+      stopCoinGeckoFallback();
+      const st = document.getElementById('wsStatus');
+      if (st) { st.textContent = '● LIVE'; st.style.color = 'var(--green)'; }
+      if (wsReconnectTimer) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
+    };
+
+    ws.onmessage = e => {
+      try {
+        const msg  = JSON.parse(e.data);
+        const data = msg.data;
+        if (!data) return;
+        updateTickerPrice(data.s.toLowerCase(), data.c, data.P);
+      } catch(err) {}
+    };
+
+    ws.onerror = () => {
+      clearTimeout(timeout);
+    };
+
+    ws.onclose = () => {
+      clearTimeout(timeout);
+      const st = document.getElementById('wsStatus');
+      if (st) { st.textContent = '재연결중...'; st.style.color = 'var(--orange)'; }
+      wsReconnectTimer = setTimeout(() => tryConnect(window._wsUrlIdx || 0), 3000);
+    };
+  };
+
+  tryConnect(urlIdx);
+}
+
+// ── CoinGecko 폴백 ──
+const GECKO_IDS = ['bitcoin','ethereum','ripple','solana'];
+let geckoTimer = null;
+
+function stopCoinGeckoFallback() {
+  if (geckoTimer) { clearInterval(geckoTimer); geckoTimer = null; }
+}
+
+async function fetchGeckoPrices() {
+  const syms = window._tickerSymbols || ['BTC','ETH','XRP','SOL'];
+  const ids   = syms.map(s => {
+    const map = {
+      BTC:'bitcoin',ETH:'ethereum',XRP:'ripple',SOL:'solana',
+      BNB:'binancecoin',ADA:'cardano',DOGE:'dogecoin',AVAX:'avalanche-2',
+      DOT:'polkadot',LINK:'chainlink',TRX:'tron',MATIC:'matic-network',
+      SHIB:'shiba-inu',LTC:'litecoin',BCH:'bitcoin-cash',UNI:'uniswap'
+    };
+    return map[s] || null;
+  }).filter(Boolean);
+
+  if (!ids.length) return;
+
+  try {
+    const res  = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true`
+    );
+    const data = await res.json();
+    syms.forEach((sym, idx) => {
+      const map = {
+        BTC:'bitcoin',ETH:'ethereum',XRP:'ripple',SOL:'solana',
+        BNB:'binancecoin',ADA:'cardano',DOGE:'dogecoin',AVAX:'avalanche-2',
+        DOT:'polkadot',LINK:'chainlink',TRX:'tron',MATIC:'matic-network',
+        SHIB:'shiba-inu',LTC:'litecoin',BCH:'bitcoin-cash',UNI:'uniswap'
+      };
+      const geckoId = map[sym];
+      if (!geckoId || !data[geckoId]) return;
+      const price  = data[geckoId].usd;
+      const change = data[geckoId].usd_24h_change;
+      const priceEl  = document.getElementById(`tick-price-${idx}`);
+      const changeEl = document.getElementById(`tick-change-${idx}`);
+      if (!priceEl) return;
+      priceEl.textContent = price.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: price < 1 ? 4 : 2
+      });
+      priceEl.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
+      if (changeEl) {
+        changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+        changeEl.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
+      }
+    });
+  } catch(e) {
     const st = document.getElementById('wsStatus');
-    if (st) { st.textContent = '● LIVE'; st.style.color = 'var(--green)'; }
-    if (wsReconnectTimer) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
-  };
+    if (st) { st.textContent = '● 연결실패'; st.style.color = 'var(--red)'; }
+  }
+}
 
-  ws.onmessage = e => {
-    try {
-      const msg  = JSON.parse(e.data);
-      const data = msg.data;
-      if (!data) return;
-      updateTickerPrice(data.s.toLowerCase(), data.c, data.P);
-    } catch(err) {}
-  };
-
-  ws.onerror = () => {
-    const st = document.getElementById('wsStatus');
-    if (st) { st.textContent = '● 오류'; st.style.color = 'var(--red)'; }
-  };
-
-  ws.onclose = () => {
-    const st = document.getElementById('wsStatus');
-    if (st) { st.textContent = '재연결중...'; st.style.color = 'var(--orange)'; }
-    wsReconnectTimer = setTimeout(connectWS, 3000);
-  };
+function startCoinGeckoFallback() {
+  stopCoinGeckoFallback();
+  fetchGeckoPrices();
+  geckoTimer = setInterval(fetchGeckoPrices, 60000);
 }
 
 function reconnectWS() {
@@ -1259,12 +1533,202 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden) reconnectWS();
 });
 
+// ── CALC 모드 전환 ──
+let psMode = 'risk'; // 'risk' | 'fixed'
+
+function setPsMode(mode) {
+  psMode = mode;
+  const riskEl  = document.getElementById('psRiskMode');
+  const fixedEl = document.getElementById('psFixedMode');
+  const btnR    = document.getElementById('modeRisk');
+  const btnF    = document.getElementById('modeFixed');
+  if (mode === 'risk') {
+    riskEl.style.display  = '';
+    fixedEl.style.display = 'none';
+    btnR.style.background = 'var(--blue)'; btnR.style.color = '#fff';
+    btnF.style.background = '#0d0d0d';     btnF.style.color = 'var(--text-3)';
+  } else {
+    riskEl.style.display  = 'none';
+    fixedEl.style.display = '';
+    btnF.style.background = 'var(--blue)'; btnF.style.color = '#fff';
+    btnR.style.background = '#0d0d0d';     btnR.style.color = 'var(--text-3)';
+  }
+  calcAll();
+}
+let buyRows = [];
+
+function addBuyRow(price = '', qty = '') {
+  const id = Date.now();
+  buyRows.push(id);
+  const wrap = document.getElementById('buyRows');
+  const div  = document.createElement('div');
+  div.className = 'buy-row';
+  div.id = 'br-' + id;
+  div.innerHTML = `
+    <div>
+      <div style="font-family:var(--mono);font-size:.58em;color:var(--text-3);letter-spacing:1px;margin-bottom:4px">매수가</div>
+      <input class="buy-input" type="number" id="bp-${id}" placeholder="0.00" value="${price}" inputmode="decimal" oninput="calcAll()">
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:.58em;color:var(--text-3);letter-spacing:1px;margin-bottom:4px">수량</div>
+      <input class="buy-input" type="number" id="bq-${id}" placeholder="0.000" value="${qty}" inputmode="decimal" oninput="calcAll()">
+    </div>
+    <button class="buy-del" onclick="delBuyRow(${id})" style="margin-top:20px">✕</button>`;
+  wrap.appendChild(div);
+  calcAll();
+}
+
+function delBuyRow(id) {
+  buyRows = buyRows.filter(x => x !== id);
+  const el = document.getElementById('br-' + id);
+  if (el) el.remove();
+  calcAll();
+}
+
+function resetCalc() {
+  buyRows = [];
+  document.getElementById('buyRows').innerHTML = '';
+  ['cSeed','cTarget','cStop'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  document.getElementById('cFee').value  = '0.1';
+  document.getElementById('cRisk').value = '2';
+  calcAll();
+  addBuyRow();
+}
+
+function fmt(n, dec = 2) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  return n.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+
+function set(id, val, dec = 2) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (val === null || val === undefined || isNaN(val)) { el.textContent = '—'; return; }
+  el.textContent = typeof val === 'string' ? val : fmt(val, dec);
+}
+
+function calcAll() {
+  // 매수 데이터 수집
+  const buys = buyRows.map(id => ({
+    price: parseFloat(document.getElementById('bp-' + id)?.value) || 0,
+    qty:   parseFloat(document.getElementById('bq-' + id)?.value) || 0
+  })).filter(b => b.price > 0 && b.qty > 0);
+
+  const fee    = parseFloat(document.getElementById('cFee')?.value) || 0;
+  const seed   = parseFloat(document.getElementById('cSeed')?.value) || null;
+  const target = parseFloat(document.getElementById('cTarget')?.value) || null;
+  const stop   = parseFloat(document.getElementById('cStop')?.value) || null;
+  const risk   = parseFloat(document.getElementById('cRisk')?.value) || 2;
+
+  // 수수료 표시
+  const feeEl = document.getElementById('totalFee');
+  if (feeEl) feeEl.textContent = (fee * 2).toFixed(2) + '%';
+
+  // 평단 계산
+  const totalInvest = buys.reduce((a, b) => a + b.price * b.qty, 0);
+  const totalQty    = buys.reduce((a, b) => a + b.qty, 0);
+  const avgPrice    = totalQty > 0 ? totalInvest / totalQty : null;
+
+  set('r-avg',    avgPrice);
+  set('r-qty',    totalQty, 4);
+  set('r-invest', totalInvest);
+
+  // BEP (수수료 포함)
+  const bep = avgPrice ? avgPrice * (1 + fee * 2 / 100) : null;
+  set('r-bep', bep ? `${fmt(bep)} USDT` : '—', 0);
+
+  // 목표가 계산
+  if (target && avgPrice && totalQty) {
+    const tProfit = (target - avgPrice) * totalQty * (1 - fee * 2 / 100);
+    const tRoi    = (target - avgPrice) / avgPrice * 100;
+    const tSeed   = seed ? tProfit / seed * 100 : null;
+    set('r-tProfit', `+${fmt(tProfit)}`);
+    set('r-tRoi',    `+${fmt(tRoi)}%`);
+    set('r-tSeed',   tSeed ? `+${fmt(tSeed)}%` : '—');
+    document.getElementById('r-tProfit').className = 'calc-value pos';
+    document.getElementById('r-tRoi').className    = 'calc-value pos';
+    document.getElementById('r-tSeed').className   = 'calc-value pos';
+
+    // R/R 비율
+    if (stop && avgPrice) {
+      const upside   = Math.abs(target - avgPrice);
+      const downside = Math.abs(avgPrice - stop);
+      const rr = downside > 0 ? upside / downside : null;
+      set('r-rr', rr ? `1 : ${fmt(rr)}` : '—', 0);
+      document.getElementById('r-rr').style.color = rr && rr >= 1 ? 'var(--green)' : 'var(--red)';
+    }
+  } else {
+    ['r-tProfit','r-tRoi','r-tSeed'].forEach(id => set(id, null));
+    set('r-rr', null);
+  }
+
+  // 손절가 계산
+  if (stop && avgPrice && totalQty) {
+    const sLoss  = (stop - avgPrice) * totalQty * (1 - fee * 2 / 100);
+    const sRoi   = (stop - avgPrice) / avgPrice * 100;
+    const sSeed  = seed ? sLoss / seed * 100 : null;
+    set('r-sLoss',  `${fmt(sLoss)}`);
+    set('r-sRoi',   `${fmt(sRoi)}%`);
+    set('r-sSeed',  sSeed ? `${fmt(sSeed)}%` : '—');
+    set('r-sExit',  `${fmt(stop)} USDT`);
+    document.getElementById('r-sLoss').className = 'calc-value neg';
+    document.getElementById('r-sRoi').className  = 'calc-value neg';
+    document.getElementById('r-sSeed').className = 'calc-value neg';
+  } else {
+    ['r-sLoss','r-sRoi','r-sSeed','r-sExit'].forEach(id => set(id, null));
+  }
+
+  // 포지션 사이징 + 고정손실 + 레버리지
+  const leverage = parseFloat(document.getElementById('cLeverage')?.value) || 1;
+  const avgForPs = avgPrice || null; // 평단 또는 직접 입력 없으면 null
+
+  let allowedLoss = null; // 허용 손실 금액 (USDT)
+
+  if (psMode === 'risk') {
+    allowedLoss = seed ? seed * risk / 100 : null;
+  } else {
+    allowedLoss = parseFloat(document.getElementById('cFixedLoss')?.value) || null;
+  }
+
+  set('r-fixedAmt', allowedLoss ? `${fmt(allowedLoss)} USDT` : '—', 0);
+
+  if (allowedLoss && avgForPs && stop) {
+    const stopDist = Math.abs(avgForPs - stop) / avgForPs; // 손절 거리 %
+    const posSize  = stopDist > 0 ? allowedLoss / stopDist : null; // 적정 투자금
+    const posQty   = (posSize && avgForPs) ? posSize / avgForPs : null; // 적정 수량
+    const levUsed  = (posSize && seed) ? posSize / (seed / leverage) : null; // 실 레버리지
+
+    set('r-pSize', posSize ? `${fmt(posSize)} USDT` : '—', 0);
+    set('r-pQty',  posQty  ? fmt(posQty, 4) : '—', 0);
+    set('r-lev',   levUsed ? `${fmt(levUsed, 1)}배` : leverage > 1 ? `${leverage}배` : '1배 (현물)', 0);
+
+    // 강제 청산가 계산 (선물: 진입가 ÷ (1 + 1/레버리지) for LONG)
+    if (leverage > 1 && avgForPs) {
+      const liqLong  = avgForPs * (1 - 1 / leverage); // LONG 청산가
+      const liqShort = avgForPs * (1 + 1 / leverage); // SHORT 청산가
+      const isLong   = lsVal === 'LONG';
+      const liqPrice = isLong ? liqLong : liqShort;
+      document.getElementById('r-liqPrice').textContent =
+        `${fmt(liqPrice)} USDT (${isLong ? 'LONG' : 'SHORT'} ${leverage}배)`;
+      document.getElementById('r-liqPrice').style.color = 'var(--red)';
+    } else {
+      set('r-liqPrice', '해당없음 (현물)', 0);
+      document.getElementById('r-liqPrice').style.color = 'var(--text-3)';
+    }
+  } else {
+    ['r-pSize','r-pQty','r-lev','r-liqPrice'].forEach(id => set(id, null));
+  }
+}
+
 // ── INIT ──
 setNow('fEntryDate');
 renderCoins();
 renderTickerBar();
 updateHeader();
 connectWS();
+addBuyRow(); // CALC 초기 매수 행 1개
 </script>
 </body>
 </html>
