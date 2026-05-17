@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0054)file:///C:/Users/Dubu/Downloads/trading_journal_5.html -->
+<html lang="ko"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="TRADE LOG">
 <title>TRADE LOG</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="./trading_journal_files/css2" rel="stylesheet">
 <style>
 :root {
   --bg:#0a0a0a;--surface:#111;--panel:#161616;--panel2:#1c1c1c;
@@ -272,6 +272,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .pos{color:var(--green)!important}
 .neg{color:var(--red)!important}
 .ora{color:var(--orange)!important}
+
+/* CALC */
+.calc-box{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.calc-box.g{background:rgba(48,209,88,.04);border-color:rgba(48,209,88,.15)}
+.calc-box.r{background:rgba(255,69,58,.04);border-color:rgba(255,69,58,.15)}
+.calc-box.b{background:rgba(10,132,255,.04);border-color:rgba(10,132,255,.15)}
+.calc-label{font-family:var(--mono);font-size:.55em;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:5px}
+.calc-value{font-family:var(--mono);font-size:.9em;font-weight:700;color:var(--text)}
+.calc-result-row{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.crr-label{font-family:var(--mono);font-size:.65em;color:var(--text-3);letter-spacing:1px}
+.crr-value{font-family:var(--mono);font-size:.9em;font-weight:700}
+.buy-row{display:grid;grid-template-columns:1fr 1fr 36px;gap:6px;margin-bottom:8px;align-items:center}
+.buy-input{background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 10px;height:44px;font-family:var(--mono);font-size:.82em;border-radius:7px;outline:none;width:100%;transition:border-color .15s}
+.buy-input:focus{border-color:var(--orange)}
+.buy-del{background:none;border:1px solid var(--border2);color:var(--text-3);height:36px;width:36px;border-radius:7px;cursor:pointer;font-size:.9em;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.buy-del:active{border-color:var(--red);color:var(--red)}
 </style>
 </head>
 <body>
@@ -286,7 +302,35 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 </div>
 
 <!-- TICKER BAR -->
-<div id="tickerBar"></div>
+<div id="tickerBar">
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;flex-shrink:0;padding:0 14px 0 0;">
+      <span style="font-family:var(--mono);font-size:.68em;color:var(--orange);font-weight:700;letter-spacing:1px">BTC/USDT</span>
+      <div style="display:flex;align-items:baseline;gap:5px">
+        <span style="font-family: var(--mono); font-size: 0.95em; font-weight: 600; color: var(--green);" id="tick-price-0">78,387.11</span>
+        <span style="font-family: var(--mono); font-size: 0.68em; color: var(--green);" id="tick-change-0">+0.16%</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;flex-shrink:0;padding:0 14px;border-left:1px solid var(--border2)">
+      <span style="font-family:var(--mono);font-size:.68em;color:var(--orange);font-weight:700;letter-spacing:1px">ETH/USDT</span>
+      <div style="display:flex;align-items:baseline;gap:5px">
+        <span style="font-family: var(--mono); font-size: 0.95em; font-weight: 600; color: var(--green);" id="tick-price-1">2,192.54</span>
+        <span style="font-family: var(--mono); font-size: 0.68em; color: var(--green);" id="tick-change-1">+0.56%</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;flex-shrink:0;padding:0 14px;border-left:1px solid var(--border2)">
+      <span style="font-family:var(--mono);font-size:.68em;color:var(--orange);font-weight:700;letter-spacing:1px">XRP/USDT</span>
+      <div style="display:flex;align-items:baseline;gap:5px">
+        <span style="font-family: var(--mono); font-size: 0.95em; font-weight: 600; color: var(--green);" id="tick-price-2">1.42</span>
+        <span style="font-family: var(--mono); font-size: 0.68em; color: var(--green);" id="tick-change-2">+0.20%</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;flex-shrink:0;padding:0 14px;border-left:1px solid var(--border2)">
+      <span style="font-family:var(--mono);font-size:.68em;color:var(--orange);font-weight:700;letter-spacing:1px">SOL/USDT</span>
+      <div style="display:flex;align-items:baseline;gap:5px">
+        <span style="font-family: var(--mono); font-size: 0.95em; font-weight: 600; color: var(--red);" id="tick-price-3">86.69</span>
+        <span style="font-family: var(--mono); font-size: 0.68em; color: var(--red);" id="tick-change-3">-0.12%</span>
+      </div>
+    </div><span style="font-family: var(--mono); font-size: 0.58em; color: var(--green); letter-spacing: 1px; flex-shrink: 0; padding-left: 14px; border-left: 1px solid var(--border2); margin-left: 14px; white-space: nowrap;" id="wsStatus">● LIVE</span></div>
 
 <div class="main">
 
@@ -306,9 +350,25 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
             <span class="ct-arrow">▼</span>
           </div>
           <div class="coin-dd" id="coinDD">
-            <div class="coin-scroll" id="coinList"></div>
+            <div class="coin-scroll" id="coinList">
+    <div class="coin-opt sel" onclick="pickCoin(&#39;BTC&#39;)">
+      <span class="coin-opt-dot"></span><span style="flex:1">BTC</span>
+      
+    </div>
+    <div class="coin-opt " onclick="pickCoin(&#39;ETH&#39;)">
+      <span class="coin-opt-dot"></span><span style="flex:1">ETH</span>
+      
+    </div>
+    <div class="coin-opt " onclick="pickCoin(&#39;XRP&#39;)">
+      <span class="coin-opt-dot"></span><span style="flex:1">XRP</span>
+      
+    </div>
+    <div class="coin-opt " onclick="pickCoin(&#39;SOL&#39;)">
+      <span class="coin-opt-dot"></span><span style="flex:1">SOL</span>
+      
+    </div></div>
             <div class="coin-add">
-              <input class="coin-add-input" id="coinAddInput" placeholder="직접 추가 (예: DOGE)" maxlength="12" onkeydown="if(event.key==='Enter')addCoin()">
+              <input class="coin-add-input" id="coinAddInput" placeholder="직접 추가 (예: DOGE)" maxlength="12" onkeydown="if(event.key===&#39;Enter&#39;)addCoin()">
               <button class="coin-add-btn" onclick="addCoin()">+ ADD</button>
             </div>
           </div>
@@ -318,8 +378,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="fg">
         <label>포지션</label>
         <div class="ls-toggle">
-          <button class="ls-btn active-long" id="lsLong" onclick="setLS('LONG')">▲ LONG</button>
-          <button class="ls-btn" id="lsShort" onclick="setLS('SHORT')">▼ SHORT</button>
+          <button class="ls-btn active-long" id="lsLong" onclick="setLS(&#39;LONG&#39;)">▲ LONG</button>
+          <button class="ls-btn" id="lsShort" onclick="setLS(&#39;SHORT&#39;)">▼ SHORT</button>
         </div>
       </div>
 
@@ -334,7 +394,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
           <label>매수일시</label>
           <div style="display:flex;gap:6px">
             <input type="datetime-local" id="fEntryDate" style="flex:1">
-            <button class="now-btn" onclick="setNow('fEntryDate')">NOW</button>
+            <button class="now-btn" onclick="setNow(&#39;fEntryDate&#39;)">NOW</button>
           </div>
         </div>
       </div>
@@ -345,7 +405,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
           <label>청산일시</label>
           <div style="display:flex;gap:6px">
             <input type="datetime-local" id="fExitDate" style="flex:1">
-            <button class="now-btn" onclick="setNow('fExitDate')">NOW</button>
+            <button class="now-btn" onclick="setNow(&#39;fExitDate&#39;)">NOW</button>
           </div>
         </div>
       </div>
@@ -362,7 +422,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="fg">
         <label>차트 스크린샷</label>
         <div class="ss-zone" id="ssZone">
-          <input type="file" accept="image/*" multiple onchange="handleFiles(this.files)">
+          <input type="file" accept="image/*" multiple="" onchange="handleFiles(this.files)">
           <div class="ss-zone-icon">📸</div>
           <div class="ss-zone-txt">탭하거나 이미지를 드래그하여 첨부</div>
         </div>
@@ -388,11 +448,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </select>
   </div>
   <div class="filter-tabs" id="historyTabs">
-    <button class="filter-tab active" onclick="setFilter('all',this)">전체</button>
-    <button class="filter-tab" onclick="setFilter('ACTIVE',this)">진행중</button>
-    <button class="filter-tab" onclick="setFilter('WIN',this)">✅ WIN</button>
-    <button class="filter-tab" onclick="setFilter('DRAW',this)">➖ DRAW</button>
-    <button class="filter-tab" onclick="setFilter('LOSE',this)">❌ LOSE</button>
+    <button class="filter-tab active" onclick="setFilter(&#39;all&#39;,this)">전체</button>
+    <button class="filter-tab" onclick="setFilter(&#39;ACTIVE&#39;,this)">진행중</button>
+    <button class="filter-tab" onclick="setFilter(&#39;WIN&#39;,this)">✅ WIN</button>
+    <button class="filter-tab" onclick="setFilter(&#39;DRAW&#39;,this)">➖ DRAW</button>
+    <button class="filter-tab" onclick="setFilter(&#39;LOSE&#39;,this)">❌ LOSE</button>
   </div>
   <div id="tradeList"></div>
   <div id="tradeEmpty" class="empty" style="display:none">
@@ -439,7 +499,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <!-- 코인별 WIN RATE -->
   <div class="sec-title" style="margin-bottom:12px">코인별 WIN RATE</div>
   <div class="filter-tabs" id="dashCoinTabs" style="margin-bottom:12px">
-    <button class="filter-tab active" onclick="setDashCoin('all',this)">전체</button>
+    <button class="filter-tab active" onclick="setDashCoin(&#39;all&#39;,this)">전체</button>
   </div>
   <div class="card" style="margin-bottom:14px">
     <div style="padding:16px" id="coinChart">
@@ -463,19 +523,113 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
+<!-- ══ CALC ══ -->
+<div class="page" id="page-calc">
+
+  <!-- ① 평단 계산기 -->
+  <div class="card">
+    <div class="card-hd">
+      <span class="card-title">평단 계산기</span>
+      <button class="btn btn-ghost btn-sm" onclick="addBuyRow()">+ 추가</button>
+    </div>
+    <div style="padding:12px 14px">
+      <!-- 헤더 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 36px;gap:6px;margin-bottom:6px;padding:0 2px">
+        <div style="font-family:var(--mono);font-size:.58em;color:var(--text-3);letter-spacing:1px">매수가 (USDT)</div>
+        <div style="font-family:var(--mono);font-size:.58em;color:var(--text-3);letter-spacing:1px">수량</div>
+        <div></div>
+      </div>
+      <div id="buyRows"><div class="buy-row" id="br-1779047055050">
+    <input class="buy-input" type="number" id="bp-1779047055050" placeholder="매수가" inputmode="decimal" oninput="calcAvg()">
+    <input class="buy-input" type="number" id="bq-1779047055050" placeholder="수량" inputmode="decimal" oninput="calcAvg()">
+    <button class="buy-del" onclick="delBuyRow(1779047055050)">✕</button></div></div>
+      <button onclick="addBuyRow()" style="width:100%;height:40px;background:var(--orange-d);border:1px dashed rgba(255,149,0,.35);color:var(--orange);font-family:var(--mono);font-size:.7em;letter-spacing:1px;border-radius:8px;cursor:pointer;margin-top:6px">+ 매수 추가</button>
+    </div>
+    <div style="border-top:1px solid var(--border);padding:12px 14px;background:rgba(0,0,0,.15);display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="calc-box"><div class="calc-label">평균 단가</div><div class="calc-value ora" id="r-avg">—</div></div>
+      <div class="calc-box"><div class="calc-label">총 수량</div><div class="calc-value" id="r-qty">—</div></div>
+      <div class="calc-box"><div class="calc-label">총 투자금</div><div class="calc-value" id="r-invest">—</div></div>
+    </div>
+  </div>
+
+  <!-- ② 포지션 계산기 -->
+  <div class="card">
+    <div class="card-hd"><span class="card-title">포지션 계산기</span></div>
+    <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+
+      <!-- 입력 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div class="fg"><label>총 시드 (USDT)</label><input type="number" id="cSeed" placeholder="" inputmode="decimal" oninput="calcPos()" style="height:46px"></div>
+        <div class="fg"><label>진입가 (USDT)</label><input type="number" id="cEntry" placeholder="" inputmode="decimal" oninput="calcPos()" style="height:46px"></div>
+        <div class="fg"><label style="color:var(--green)">🎯 목표가</label><input type="number" id="cTarget" placeholder="" inputmode="decimal" oninput="calcPos()" style="height:46px;border-color:rgba(48,209,88,.3)"></div>
+        <div class="fg"><label style="color:var(--red)">🔴 손절가</label><input type="number" id="cStop" placeholder="" inputmode="decimal" oninput="calcPos()" style="height:46px;border-color:rgba(255,69,58,.3)"></div>
+        <div class="fg" style="grid-column:span 2"><label style="color:var(--red)">고정 허용손실 (USDT)</label><input type="number" id="cFixedLoss" placeholder="" inputmode="decimal" oninput="calcPos()" style="height:46px;border-color:rgba(255,69,58,.25)"></div>
+        <div class="fg"><label>수량</label><input type="number" id="cQty" placeholder="" inputmode="decimal" oninput="calcPos()" style="height:46px"></div>
+        <div class="fg"><label>레버리지 (현물=1)</label><input type="number" id="cLeverage" placeholder="" inputmode="decimal" oninput="calcPos()" style="height:46px"></div>
+      </div>
+
+      <!-- BEP -->
+      <div class="calc-result-row">
+        <div class="crr-label">손익분기점 (BEP)</div>
+        <div class="crr-value ora" id="r-bep">—</div>
+      </div>
+
+      <!-- 포지션 사이징 -->
+      <div style="background:rgba(10,132,255,.05);border:1px solid rgba(10,132,255,.15);border-radius:10px;padding:12px">
+        <div style="font-family:var(--mono);font-size:.6em;letter-spacing:2px;color:var(--blue);margin-bottom:8px">📐 포지션 사이징</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div class="calc-box b"><div class="calc-label">허용 손실</div><div class="calc-value" id="r-fixedAmt">—</div></div>
+          <div class="calc-box b"><div class="calc-label">적정 수량</div><div class="calc-value" id="r-pQty">—</div></div>
+          <div class="calc-box b"><div class="calc-label">적정 투자금</div><div class="calc-value" id="r-pSize">—</div></div>
+          <div class="calc-box b"><div class="calc-label">레버리지</div><div class="calc-value" id="r-lev">—</div></div>
+          <div class="calc-box b" style="grid-column:span 2"><div class="calc-label">강제청산가 (선물)</div><div class="calc-value" id="r-liqPrice">—</div></div>
+        </div>
+      </div>
+
+      <!-- 목표 달성 시 -->
+      <div style="background:rgba(48,209,88,.05);border:1px solid rgba(48,209,88,.15);border-radius:10px;padding:12px">
+        <div style="font-family:var(--mono);font-size:.6em;letter-spacing:2px;color:var(--green);margin-bottom:8px">🎯 목표 달성 시</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div class="calc-box g"><div class="calc-label">예상 수익</div><div class="calc-value" id="r-tProfit">—</div></div>
+          <div class="calc-box g"><div class="calc-label">수익률</div><div class="calc-value" id="r-tRoi">—</div></div>
+          <div class="calc-box g"><div class="calc-label">시드 대비</div><div class="calc-value" id="r-tSeed">—</div></div>
+          <div class="calc-box g"><div class="calc-label">R/R 비율</div><div class="calc-value" id="r-rr">—</div></div>
+        </div>
+      </div>
+
+      <!-- 손절 시 -->
+      <div style="background:rgba(255,69,58,.05);border:1px solid rgba(255,69,58,.15);border-radius:10px;padding:12px">
+        <div style="font-family:var(--mono);font-size:.6em;letter-spacing:2px;color:var(--red);margin-bottom:8px">🔴 손절 시</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div class="calc-box r"><div class="calc-label">최대 손실</div><div class="calc-value" id="r-sLoss">—</div></div>
+          <div class="calc-box r"><div class="calc-label">손실률</div><div class="calc-value" id="r-sRoi">—</div></div>
+          <div class="calc-box r"><div class="calc-label">시드 대비</div><div class="calc-value" id="r-sSeed">—</div></div>
+          <div class="calc-box r"><div class="calc-label">손절가</div><div class="calc-value" id="r-sExit">—</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 초기화 -->
+  <button onclick="resetCalc()" style="width:100%;height:44px;background:none;border:1px solid var(--border2);color:var(--text-3);font-family:var(--mono);font-size:.72em;letter-spacing:1.5px;border-radius:10px;cursor:pointer;margin-bottom:14px">초기화</button>
+
 </div>
+
+</div><!-- /main -->
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <button class="nav-btn active" onclick="goPage('new',this)"><span class="nav-icon">✏️</span>NEW</button>
-  <button class="nav-btn" onclick="goPage('history',this)"><span class="nav-icon">📋</span>HISTORY</button>
-  <button class="nav-btn" onclick="goPage('dash',this)"><span class="nav-icon">📊</span>DASH</button>
-  <button class="nav-btn" onclick="goPage('weekly',this)"><span class="nav-icon">📅</span>WEEKLY</button>
+  <button class="nav-btn active" onclick="goPage(&#39;new&#39;,this)"><span class="nav-icon">✏️</span>NEW</button>
+  <button class="nav-btn" onclick="goPage(&#39;history&#39;,this)"><span class="nav-icon">📋</span>HISTORY</button>
+  <button class="nav-btn" onclick="goPage(&#39;dash&#39;,this)"><span class="nav-icon">📊</span>DASH</button>
+  <button class="nav-btn" onclick="goPage(&#39;weekly&#39;,this)"><span class="nav-icon">📅</span>WEEKLY</button>
+  <button class="nav-btn" onclick="goPage(&#39;calc&#39;,this)"><span class="nav-icon">🧮</span>CALC</button>
 </div>
 
 <!-- IMG MODAL -->
-<div class="modal-ov" id="imgModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <img id="imgModalSrc" src="" alt="">
+<div class="modal-ov" id="imgModal" onclick="if(event.target===this)this.classList.remove(&#39;open&#39;)">
+  <img id="imgModalSrc" src="file:///C:/Users/Dubu/Downloads/trading_journal_5.html" alt="">
 </div>
 
 <script>
@@ -1220,33 +1374,128 @@ function connectWS() {
   if (ws) { try { ws.close(); } catch(e) {} }
 
   const streams = syms.map(s => `${s}@ticker`).join('/');
-  ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
 
-  ws.onopen = () => {
+  // 대체 주소 순서대로 시도
+  const WS_URLS = [
+    `wss://data-stream.binance.com/stream?streams=${streams}`,
+    `wss://stream.binance.com:9443/stream?streams=${streams}`,
+    `wss://stream.binance.com:443/stream?streams=${streams}`
+  ];
+
+  let urlIdx = window._wsUrlIdx || 0;
+  window._wsUrlIdx = urlIdx;
+
+  const tryConnect = (idx) => {
+    if (idx >= WS_URLS.length) {
+      // 모든 WS 주소 실패 → CoinGecko 폴백
+      const st = document.getElementById('wsStatus');
+      if (st) { st.textContent = '● 60s 갱신'; st.style.color = 'var(--text-3)'; }
+      startCoinGeckoFallback();
+      return;
+    }
+
+    ws = new WebSocket(WS_URLS[idx]);
+
+    // 5초 안에 연결 안 되면 다음 주소 시도
+    const timeout = setTimeout(() => {
+      try { ws.close(); } catch(e) {}
+      tryConnect(idx + 1);
+    }, 5000);
+
+    ws.onopen = () => {
+      clearTimeout(timeout);
+      window._wsUrlIdx = idx; // 성공한 주소 기억
+      stopCoinGeckoFallback();
+      const st = document.getElementById('wsStatus');
+      if (st) { st.textContent = '● LIVE'; st.style.color = 'var(--green)'; }
+      if (wsReconnectTimer) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
+    };
+
+    ws.onmessage = e => {
+      try {
+        const msg  = JSON.parse(e.data);
+        const data = msg.data;
+        if (!data) return;
+        updateTickerPrice(data.s.toLowerCase(), data.c, data.P);
+      } catch(err) {}
+    };
+
+    ws.onerror = () => {
+      clearTimeout(timeout);
+    };
+
+    ws.onclose = () => {
+      clearTimeout(timeout);
+      const st = document.getElementById('wsStatus');
+      if (st) { st.textContent = '재연결중...'; st.style.color = 'var(--orange)'; }
+      wsReconnectTimer = setTimeout(() => tryConnect(window._wsUrlIdx || 0), 3000);
+    };
+  };
+
+  tryConnect(urlIdx);
+}
+
+// ── CoinGecko 폴백 ──
+const GECKO_IDS = ['bitcoin','ethereum','ripple','solana'];
+let geckoTimer = null;
+
+function stopCoinGeckoFallback() {
+  if (geckoTimer) { clearInterval(geckoTimer); geckoTimer = null; }
+}
+
+async function fetchGeckoPrices() {
+  const syms = window._tickerSymbols || ['BTC','ETH','XRP','SOL'];
+  const ids   = syms.map(s => {
+    const map = {
+      BTC:'bitcoin',ETH:'ethereum',XRP:'ripple',SOL:'solana',
+      BNB:'binancecoin',ADA:'cardano',DOGE:'dogecoin',AVAX:'avalanche-2',
+      DOT:'polkadot',LINK:'chainlink',TRX:'tron',MATIC:'matic-network',
+      SHIB:'shiba-inu',LTC:'litecoin',BCH:'bitcoin-cash',UNI:'uniswap'
+    };
+    return map[s] || null;
+  }).filter(Boolean);
+
+  if (!ids.length) return;
+
+  try {
+    const res  = await fetch(
+      `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=usd&include_24hr_change=true`
+    );
+    const data = await res.json();
+    syms.forEach((sym, idx) => {
+      const map = {
+        BTC:'bitcoin',ETH:'ethereum',XRP:'ripple',SOL:'solana',
+        BNB:'binancecoin',ADA:'cardano',DOGE:'dogecoin',AVAX:'avalanche-2',
+        DOT:'polkadot',LINK:'chainlink',TRX:'tron',MATIC:'matic-network',
+        SHIB:'shiba-inu',LTC:'litecoin',BCH:'bitcoin-cash',UNI:'uniswap'
+      };
+      const geckoId = map[sym];
+      if (!geckoId || !data[geckoId]) return;
+      const price  = data[geckoId].usd;
+      const change = data[geckoId].usd_24h_change;
+      const priceEl  = document.getElementById(`tick-price-${idx}`);
+      const changeEl = document.getElementById(`tick-change-${idx}`);
+      if (!priceEl) return;
+      priceEl.textContent = price.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: price < 1 ? 4 : 2
+      });
+      priceEl.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
+      if (changeEl) {
+        changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+        changeEl.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
+      }
+    });
+  } catch(e) {
     const st = document.getElementById('wsStatus');
-    if (st) { st.textContent = '● LIVE'; st.style.color = 'var(--green)'; }
-    if (wsReconnectTimer) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
-  };
+    if (st) { st.textContent = '● 연결실패'; st.style.color = 'var(--red)'; }
+  }
+}
 
-  ws.onmessage = e => {
-    try {
-      const msg  = JSON.parse(e.data);
-      const data = msg.data;
-      if (!data) return;
-      updateTickerPrice(data.s.toLowerCase(), data.c, data.P);
-    } catch(err) {}
-  };
-
-  ws.onerror = () => {
-    const st = document.getElementById('wsStatus');
-    if (st) { st.textContent = '● 오류'; st.style.color = 'var(--red)'; }
-  };
-
-  ws.onclose = () => {
-    const st = document.getElementById('wsStatus');
-    if (st) { st.textContent = '재연결중...'; st.style.color = 'var(--orange)'; }
-    wsReconnectTimer = setTimeout(connectWS, 3000);
-  };
+function startCoinGeckoFallback() {
+  stopCoinGeckoFallback();
+  fetchGeckoPrices();
+  geckoTimer = setInterval(fetchGeckoPrices, 60000);
 }
 
 function reconnectWS() {
@@ -1259,12 +1508,149 @@ document.addEventListener('visibilitychange', () => {
   if (!document.hidden) reconnectWS();
 });
 
+// ── CALC 유틸 ──
+let buyRows = [];
+
+function sv(id) {
+  const v = parseFloat(document.getElementById(id)?.value);
+  return isNaN(v) ? null : v;
+}
+function fmt(n, d=2) { return n == null || isNaN(n) ? '—' : n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+const COLORS = { pos:'var(--green)', neg:'var(--red)', ora:'var(--orange)', blu:'var(--blue)', '':'var(--text)' };
+function setEl(id, txt, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = txt;
+  if (cls !== undefined) el.style.color = COLORS[cls] || 'var(--text)';
+}
+
+// ── 평단 계산기 ──
+function addBuyRow() {
+  const id  = Date.now();
+  buyRows.push(id);
+  const div = document.createElement('div');
+  div.className = 'buy-row';
+  div.id = 'br-' + id;
+  div.innerHTML = `
+    <input class="buy-input" type="number" id="bp-${id}" placeholder="매수가" inputmode="decimal" oninput="calcAvg()">
+    <input class="buy-input" type="number" id="bq-${id}" placeholder="수량" inputmode="decimal" oninput="calcAvg()">
+    <button class="buy-del" onclick="delBuyRow(${id})">✕</button>`;
+  document.getElementById('buyRows').appendChild(div);
+}
+
+function delBuyRow(id) {
+  buyRows = buyRows.filter(x => x !== id);
+  document.getElementById('br-' + id)?.remove();
+  calcAvg();
+}
+
+function calcAvg() {
+  const buys = buyRows.map(id => ({
+    p: parseFloat(document.getElementById('bp-'+id)?.value)||0,
+    q: parseFloat(document.getElementById('bq-'+id)?.value)||0
+  })).filter(b => b.p > 0 && b.q > 0);
+
+  const invest = buys.reduce((a,b) => a + b.p*b.q, 0);
+  const qty    = buys.reduce((a,b) => a + b.q, 0);
+  const avg    = qty > 0 ? invest/qty : null;
+
+  setEl('r-avg',    avg    ? fmt(avg)    : '—', avg    ? 'ora' : '');
+  setEl('r-qty',    qty    ? fmt(qty, 4) : '—', '');
+  setEl('r-invest', invest ? fmt(invest) : '—', '');
+}
+
+// ── 포지션 계산기 ──
+function calcPos() {
+  const seed   = sv('cSeed');
+  const entry  = sv('cEntry');
+  const qty    = sv('cQty');
+  const target = sv('cTarget');
+  const stop   = sv('cStop');
+  const fixed  = sv('cFixedLoss');
+  const lev    = sv('cLeverage') || 1;
+
+  // BEP = 진입가 그대로 (수수료 없음)
+  setEl('r-bep', entry ? fmt(entry) + ' USDT' : '—', entry ? 'ora' : '');
+
+  // ── 목표가 결과 ──
+  if (entry && target) {
+    const roi    = (target - entry) / entry * 100;
+    const profit = qty ? (target - entry) * qty : null;
+    const vsSeed = (profit !== null && seed) ? profit / seed * 100 : null;
+
+    setEl('r-tRoi',    (roi >= 0 ? '+' : '') + fmt(roi) + '%', 'pos');
+    setEl('r-tProfit', profit !== null ? (profit >= 0 ? '+' : '') + fmt(profit) + ' USDT' : (roi >= 0 ? '+' : '') + fmt(roi) + '%', 'pos');
+    setEl('r-tSeed',   vsSeed !== null ? (vsSeed >= 0 ? '+' : '') + fmt(vsSeed) + '%' : '—', 'pos');
+
+    if (stop) {
+      const rr = Math.abs(target - entry) / Math.abs(entry - stop);
+      setEl('r-rr', '1 : ' + fmt(rr), rr >= 1 ? 'pos' : 'neg');
+    } else {
+      setEl('r-rr', '—', '');
+    }
+  } else {
+    ['r-tProfit','r-tRoi','r-tSeed','r-rr'].forEach(id => setEl(id, '—', ''));
+  }
+
+  // ── 손절 결과 ──
+  if (entry && stop) {
+    const roi    = (stop - entry) / entry * 100;
+    const loss   = qty ? (stop - entry) * qty : null;
+    const vsSeed = (loss !== null && seed) ? loss / seed * 100 : null;
+
+    setEl('r-sRoi',  fmt(roi) + '%', 'neg');
+    setEl('r-sLoss', loss !== null ? fmt(loss) + ' USDT' : fmt(roi) + '%', 'neg');
+    setEl('r-sSeed', vsSeed !== null ? fmt(vsSeed) + '%' : '—', 'neg');
+    setEl('r-sExit', fmt(stop) + ' USDT', 'neg');
+  } else {
+    ['r-sLoss','r-sRoi','r-sSeed','r-sExit'].forEach(id => setEl(id, '—', ''));
+  }
+
+  // ── 포지션 사이징 ──
+  // 고정손실 + 진입가 + 손절가 → 수량 자동계산
+  if (entry && stop && fixed) {
+    const dist   = Math.abs(entry - stop);           // 1개당 손실금액
+    const posQty = dist > 0 ? fixed / dist : null;   // 적정 수량
+    const posAmt = posQty ? posQty * entry : null;   // 적정 투자금
+    const levUsed = (posAmt && seed) ? posAmt / seed : null;
+
+    setEl('r-fixedAmt', fmt(fixed) + ' USDT', 'neg');
+    setEl('r-pQty',     posQty ? fmt(posQty, 4) : '—', 'blu');
+    setEl('r-pSize',    posAmt ? fmt(posAmt) + ' USDT' : '—', 'blu');
+    setEl('r-lev',      levUsed ? fmt(levUsed * lev, 1) + '배' : lev + '배', 'ora');
+
+    if (lev > 1 && entry) {
+      const liq = lsVal === 'LONG'
+        ? entry * (1 - 1 / lev)
+        : entry * (1 + 1 / lev);
+      setEl('r-liqPrice', fmt(liq) + ' USDT', 'neg');
+    } else {
+      const el = document.getElementById('r-liqPrice');
+      if (el) { el.textContent = '해당없음 (현물)'; el.className = 'calc-value'; el.style.color = 'var(--text-3)'; }
+    }
+  } else {
+    ['r-fixedAmt','r-pQty','r-pSize','r-lev','r-liqPrice'].forEach(id => setEl(id, '—', ''));
+  }
+}
+
+function resetCalc() {
+  buyRows = [];
+  document.getElementById('buyRows').innerHTML = '';
+  ['cSeed','cEntry','cQty','cTarget','cStop','cFixedLoss','cLeverage'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  calcAvg(); calcPos();
+  addBuyRow();
+}
+
 // ── INIT ──
 setNow('fEntryDate');
 renderCoins();
 renderTickerBar();
 updateHeader();
 connectWS();
+addBuyRow(); // CALC 초기 매수 행 1개
 </script>
-</body>
-</html>
+
+
+</body></html>
