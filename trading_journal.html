@@ -557,6 +557,27 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="card-hd"><span class="card-title">포지션 계산기</span></div>
     <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
 
+      <!-- 코인 선택 -->
+      <div class="coin-sel" id="calcCoinSel">
+        <div class="coin-trigger" id="calcCoinTrigger" onclick="toggleCalcCoinDD()">
+          <span class="ct-left"><span class="ct-dot"></span><span id="calcCoinLabel">BTC</span></span>
+          <span class="ct-arrow">▼</span>
+        </div>
+        <div class="coin-dd" id="calcCoinDD">
+          <div class="coin-scroll" id="calcCoinList"></div>
+          <div class="coin-add">
+            <input class="coin-add-input" id="calcCoinAddInput" placeholder="직접 추가 (예: DOGE)" maxlength="12" onkeydown="if(event.key==='Enter')addCoinFromCalc()">
+            <button class="coin-add-btn" onclick="addCoinFromCalc()">+ ADD</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LONG/SHORT -->
+      <div class="ls-toggle">
+        <button class="ls-btn active-long" id="cLsLong" onclick="setCalcLS('LONG')">▲ LONG</button>
+        <button class="ls-btn" id="cLsShort" onclick="setCalcLS('SHORT')">▼ SHORT</button>
+      </div>
+
       <!-- 입력 -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         <div class="fg"><label>총 시드 (USDT)</label><input type="number" id="cSeed" placeholder="" inputmode="decimal" oninput="calcPos()" style="height:46px"></div>
@@ -611,12 +632,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
 
+  <!-- NEW TRADE 적용 버튼 -->
+  <button onclick="applyToNew()" style="width:100%;height:48px;background:var(--orange);border:none;color:#000;font-family:var(--mono);font-size:.78em;font-weight:700;letter-spacing:1.5px;border-radius:10px;cursor:pointer;margin-bottom:8px">→ NEW TRADE에 적용</button>
+
   <!-- 초기화 -->
   <button onclick="resetCalc()" style="width:100%;height:44px;background:none;border:1px solid var(--border2);color:var(--text-3);font-family:var(--mono);font-size:.72em;letter-spacing:1.5px;border-radius:10px;cursor:pointer;margin-bottom:14px">초기화</button>
 
 </div>
 
 </div><!-- /main -->
+
+<!-- DATA BUTTONS -->
+<div style="position:fixed;top:54px;right:12px;z-index:99;display:flex;gap:6px">
+  <button onclick="exportData()" style="height:32px;padding:0 12px;background:var(--panel);border:1px solid var(--border2);color:var(--text-2);font-family:var(--mono);font-size:.62em;letter-spacing:1px;border-radius:7px;cursor:pointer">↓ 백업</button>
+  <button onclick="importData()" style="height:32px;padding:0 12px;background:var(--panel);border:1px solid var(--border2);color:var(--text-2);font-family:var(--mono);font-size:.62em;letter-spacing:1px;border-radius:7px;cursor:pointer">↑ 복원</button>
+</div>
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
@@ -704,7 +734,7 @@ function addCoin() {
   const v = inp.value.trim().toUpperCase();
   if (!v || coins.includes(v)) { inp.value = ''; return; }
   coins.push(v); saveCoins(); inp.value = '';
-  renderCoins(); pickCoin(v);
+  renderCoins(); renderCalcCoins(); pickCoin(v);
   renderTickerBar(); reconnectWS();
 }
 
@@ -712,7 +742,8 @@ function delCoin(e, c) {
   e.stopPropagation();
   coins = coins.filter(x => x !== c); saveCoins();
   if (selCoin === c) pickCoin(coins[0] || 'BTC');
-  renderCoins();
+  if (calcCoin === c) pickCalcCoin(coins[0] || 'BTC');
+  renderCoins(); renderCalcCoins();
   renderTickerBar(); reconnectWS();
 }
 
@@ -789,13 +820,13 @@ function saveTrade() {
 
   if (!coin || !entry || !amount || !eDate) { alert('코인, 매수가, 수량, 매수일은 필수입니다.'); return; }
 
-  const pnl    = exit ? (exit - entry) * amount : null;
-  const roi    = exit ? (exit - entry) / entry * 100 : null;
+  const pnl    = exit ? (lsVal === 'SHORT' ? (entry - exit) : (exit - entry)) * amount : null;
+  const roi    = exit ? (lsVal === 'SHORT' ? (entry - exit) : (exit - entry)) / entry * 100 : null;
   const slGap  = (sl && entry) ? (sl - entry) / entry * 100 : null;
   const dur    = (xDate && eDate) ? (new Date(xDate) - new Date(eDate)) / 3600000 : null; // 시간 단위
 
   let result = 'ACTIVE';
-  if (exit) result = (sl && exit <= sl) ? 'LOSE' : 'WIN';
+  if (exit) result = (sl && (lsVal === 'SHORT' ? exit >= sl : exit <= sl)) ? 'LOSE' : 'WIN';
 
   trades.unshift({
     id: 'T' + Date.now(),
@@ -1436,7 +1467,55 @@ function connectWS() {
 }
 
 // ── CoinGecko 폴백 ──
-const GECKO_IDS = ['bitcoin','ethereum','ripple','solana'];
+let calcLsVal = 'LONG';
+let calcCoin = coins[0];
+
+function renderCalcCoins() {
+  document.getElementById('calcCoinList').innerHTML = coins.map(c => `
+    <div class="coin-opt ${c===calcCoin?'sel':''}" onclick="pickCalcCoin('${c}')">
+      <span class="coin-opt-dot"></span><span style="flex:1">${c}</span>
+      ${!DEFAULT_COINS.includes(c) ? `<span class="coin-opt-del" onclick="delCoin(event,'${c}')">✕</span>` : ''}
+    </div>`).join('');
+}
+
+function toggleCalcCoinDD() {
+  const dd = document.getElementById('calcCoinDD');
+  const tr = document.getElementById('calcCoinTrigger');
+  const open = dd.classList.toggle('open');
+  tr.classList.toggle('open', open);
+  if (open) renderCalcCoins();
+}
+
+function pickCalcCoin(c) {
+  calcCoin = c;
+  document.getElementById('calcCoinLabel').textContent = c;
+  document.getElementById('calcCoinDD').classList.remove('open');
+  document.getElementById('calcCoinTrigger').classList.remove('open');
+}
+
+function addCoinFromCalc() {
+  const inp = document.getElementById('calcCoinAddInput');
+  const v = inp.value.trim().toUpperCase();
+  if (!v || coins.includes(v)) { inp.value = ''; return; }
+  coins.push(v); saveCoins(); inp.value = '';
+  renderCoins(); renderCalcCoins(); pickCalcCoin(v);
+  renderTickerBar(); reconnectWS();
+}
+
+document.addEventListener('click', e => {
+  const sel = document.getElementById('calcCoinSel');
+  if (sel && !sel.contains(e.target)) {
+    document.getElementById('calcCoinDD').classList.remove('open');
+    document.getElementById('calcCoinTrigger').classList.remove('open');
+  }
+});
+
+function setCalcLS(v) {
+  calcLsVal = v;
+  document.getElementById('cLsLong').className  = 'ls-btn' + (v==='LONG'  ? ' active-long'  : '');
+  document.getElementById('cLsShort').className = 'ls-btn' + (v==='SHORT' ? ' active-short' : '');
+  calcPos();
+}
 let geckoTimer = null;
 
 function stopCoinGeckoFallback() {
@@ -1613,7 +1692,7 @@ function calcPos() {
     setEl('r-lev',      levUsed ? fmt(levUsed * lev, 1) + '배' : lev + '배', 'ora');
 
     if (lev > 1 && entry) {
-      const liq = lsVal === 'LONG'
+      const liq = calcLsVal === 'LONG'
         ? entry * (1 - 1 / lev)
         : entry * (1 + 1 / lev);
       setEl('r-liqPrice', fmt(liq) + ' USDT', 'neg');
@@ -1624,6 +1703,67 @@ function calcPos() {
   } else {
     ['r-fixedAmt','r-pQty','r-pSize','r-lev','r-liqPrice'].forEach(id => setEl(id, '—', ''));
   }
+}
+
+function applyToNew() {
+  const entry = document.getElementById('cEntry')?.value;
+  const stop  = document.getElementById('cStop')?.value;
+  const qty   = document.getElementById('r-pQty')?.textContent;
+
+  if (!entry) { alert('진입가를 먼저 입력하세요.'); return; }
+
+  if (entry) document.getElementById('fEntry').value = entry;
+  if (stop)  document.getElementById('fSL').value    = stop;
+  if (qty && qty !== '—') document.getElementById('fAmount').value = parseFloat(qty.replace(/,/g,''));
+
+  pickCoin(calcCoin);
+  setLS(calcLsVal);
+  setNow('fEntryDate');
+
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-new').classList.add('active');
+  document.querySelector('.nav-btn').classList.add('active');
+}
+
+function exportData() {
+  const data = {
+    trades: JSON.parse(localStorage.getItem('mj_trades') || '[]'),
+    coins:  JSON.parse(localStorage.getItem('mj_coins')  || '[]'),
+    weekly: JSON.parse(localStorage.getItem('mj_weekly') || '{}'),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `tradelog_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!data.trades) { alert('올바른 백업 파일이 아닙니다.'); return; }
+        if (!confirm(`거래 ${data.trades.length}건을 불러옵니다. 현재 데이터에 덮어씁니다.`)) return;
+        localStorage.setItem('mj_trades', JSON.stringify(data.trades));
+        if (data.coins)  localStorage.setItem('mj_coins',  JSON.stringify(data.coins));
+        if (data.weekly) localStorage.setItem('mj_weekly', JSON.stringify(data.weekly));
+        trades = data.trades;
+        coins  = data.coins || coins;
+        updateHeader(); renderCoins(); renderTickerBar();
+        alert('불러오기 완료!');
+      } catch { alert('파일 읽기 오류.'); }
+    };
+    r.readAsText(file);
+  };
+  input.click();
 }
 
 function resetCalc() {
@@ -1638,6 +1778,7 @@ function resetCalc() {
 // ── INIT ──
 setNow('fEntryDate');
 renderCoins();
+renderCalcCoins();
 renderTickerBar();
 updateHeader();
 connectWS();
