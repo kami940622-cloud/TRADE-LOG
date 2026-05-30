@@ -67,14 +67,7 @@ body.light-theme .edit-form{background:rgba(200,112,0,.03)}
 body.light-theme .bottom-nav{background:#f8f0e0;border-top-color:var(--border)}
 body.light-theme .modal-ov{background:rgba(40,25,10,.75)}
 
-/* ── SETTINGS MODAL ── */
-.settings-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
-.settings-ov.open{display:flex}
-.settings-panel{background:var(--panel);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:340px;overflow:hidden}
-.settings-hd{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.settings-title{font-family:var(--mono);font-size:.72em;letter-spacing:2px;text-transform:uppercase;color:var(--orange)}
-.settings-close{background:transparent;border:1px solid var(--border2);color:var(--text-3);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:.8em;transition:all .2s}
-.settings-close:hover{border-color:var(--text-2);color:var(--text-2)}
+/* ── SETTINGS (탭 페이지용) ── */
 .settings-body{padding:16px 18px;display:flex;flex-direction:column;gap:16px}
 .settings-row{display:flex;flex-direction:column;gap:8px}
 .settings-label{font-family:var(--mono);font-size:.58em;letter-spacing:2px;text-transform:uppercase;color:var(--text-3)}
@@ -84,16 +77,6 @@ body.light-theme .modal-ov{background:rgba(40,25,10,.75)}
 .sopt{background:transparent;border:1px solid var(--border2);color:var(--text-3);height:38px;border-radius:8px;font-family:var(--mono);font-size:.65em;letter-spacing:.5px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
 .sopt:hover{border-color:rgba(255,149,0,.4);color:rgba(255,149,0,.7)}
 .sopt.active{border-color:var(--orange);color:var(--orange);box-shadow:0 0 10px rgba(255,149,0,.1)}
-
-/* ── DATA BUTTONS ── */
-.data-btns{position:fixed;top:112px;right:10px;z-index:250;display:flex;gap:5px}
-.data-btn{height:28px;padding:0 10px;border-radius:6px;font-family:var(--mono);font-size:.58em;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.data-btn-backup{background:rgba(0,0,0,.6);border:1px solid rgba(10,132,255,.4);color:var(--blue)}
-.data-btn-backup:hover{border-color:var(--blue);box-shadow:0 0 10px rgba(10,132,255,.15)}
-.data-btn-restore{background:rgba(0,0,0,.6);border:1px solid rgba(48,209,88,.4);color:var(--green)}
-.data-btn-restore:hover{border-color:var(--green);box-shadow:0 0 10px rgba(48,209,88,.15)}
-.data-btn-settings{background:rgba(0,0,0,.6);border:1px solid rgba(255,149,0,.4);color:var(--orange)}
-.data-btn-settings:hover{border-color:var(--orange);box-shadow:0 0 10px rgba(255,149,0,.15)}
 
 /* ── APP SHELL (줌 고정 핵심) ── */
 html,body{height:100%;overflow:hidden}
