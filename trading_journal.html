@@ -2852,36 +2852,40 @@ applyZoom(localStorage.getItem('mj_zoom') === '1');
 // 홈화면 아이콘 생성
 (function(){
   try {
+    const S = 512;
     const c = document.createElement('canvas');
-    c.width = c.height = 512;
+    c.width = c.height = S;
     const ctx = c.getContext('2d');
     // 배경
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(0,0,512,512);
-    // 오렌지 외곽 테두리
-    ctx.strokeStyle = '#ff9500';
-    ctx.lineWidth = 16;
-    const r = 80;
-    ctx.beginPath();
-    ctx.moveTo(r,8); ctx.lineTo(512-r,8);
-    ctx.quadraticCurveTo(504,8,504,r);
-    ctx.lineTo(504,512-r);
-    ctx.quadraticCurveTo(504,504,512-r,504);
-    ctx.lineTo(r,504);
-    ctx.quadraticCurveTo(8,504,8,512-r);
-    ctx.lineTo(8,r);
-    ctx.quadraticCurveTo(8,8,r,8);
-    ctx.stroke();
-    // T 문자 (두꺼운)
-    ctx.fillStyle = '#ff9500';
-    ctx.font = 'bold 260px IBM Plex Mono, monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('TL', 256, 256);
-    // 하단 작은 텍스트
-    ctx.font = '500 56px IBM Plex Mono, monospace';
-    ctx.fillStyle = 'rgba(255,149,0,.5)';
-    ctx.fillText('TRADE LOG', 256, 420);
+    ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,S,S);
+    // 캔들 데이터
+    const pad=S*0.1, bot=S*0.76, h=S*0.58, cw=S*0.074;
+    const xs = [0,1,2,3,4,5].map(i => pad + i*(S*0.135) + cw/2 + S*0.01);
+    const data = [
+      [0.82,0.75,0.38,0.22,'#ff453a'],
+      [0.90,0.80,0.52,0.40,'#ff453a'],
+      [0.96,0.90,0.70,0.62,'#ff9500'],
+      [0.88,0.72,0.35,0.20,'#32d74b'],
+      [0.95,0.88,0.55,0.42,'#32d74b'],
+      [1.00,0.94,0.62,0.50,'#32d74b'],
+    ];
+    data.forEach(([wt,bt,bb,wb,col],i) => {
+      const y0=bot-h;
+      const wickT=y0+h*(1-wt), bodyT=y0+h*(1-bt), bodyB=y0+h*(1-bb), wickB=y0+h*(1-wb);
+      ctx.shadowColor=col; ctx.shadowBlur=14;
+      ctx.strokeStyle=col; ctx.lineWidth=Math.max(2,cw*0.13); ctx.lineCap='square';
+      ctx.beginPath(); ctx.moveTo(xs[i],wickT); ctx.lineTo(xs[i],bodyT); ctx.stroke();
+      ctx.fillStyle=col; ctx.fillRect(xs[i]-cw/2, bodyT, cw, bodyB-bodyT);
+      ctx.beginPath(); ctx.moveTo(xs[i],bodyB); ctx.lineTo(xs[i],wickB); ctx.stroke();
+      ctx.shadowBlur=0;
+    });
+    // 오렌지 하단 바
+    ctx.shadowBlur=0;
+    ctx.fillStyle='#ff9500'; ctx.fillRect(0, S*0.82, S, S*0.18);
+    ctx.fillStyle='#000';
+    ctx.font=`bold ${S*0.09}px IBM Plex Mono,monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('TRADE LOG', S/2, S*0.91);
     const link = document.getElementById('appIconLink');
     if (link) link.href = c.toDataURL('image/png');
   } catch(e) {}
