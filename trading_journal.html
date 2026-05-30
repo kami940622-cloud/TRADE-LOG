@@ -97,14 +97,11 @@ html,body{height:100%;overflow:hidden}
 body{display:flex;flex-direction:column}
 .top-bar{flex-shrink:0;z-index:200;position:relative}
 .content-wrap{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:none}
-/* 설정 사이드바 */
-.settings-sidebar{display:none}
+/* 스플릿 레이아웃 (가로/맥북) */
 @media(min-width:1024px){
-  .settings-sidebar{display:block}
-  .main.split-view{display:grid;grid-template-columns:1fr 360px 220px;gap:16px;align-items:start}
+  .main.split-view{display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:start}
   .main.split-view .page.active{grid-column:1}
   .main.split-view #page-calc{display:block!important;grid-column:2;grid-row:1;position:sticky;top:16px}
-  .main.split-view .settings-sidebar{grid-column:3;grid-row:1;position:sticky;top:16px}
 }
 
 /* HEADER */
@@ -965,46 +962,14 @@ body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
 
 </div>
 
-<!-- ══ 설정 사이드바 (와이드 화면 3번째 컬럼) ══ -->
-<div class="settings-sidebar" id="settingsSidebar">
+<!-- ══ SETTING ══ -->
+<div class="page" id="page-setting">
   <div class="card">
     <div class="card-hd"><span class="card-title">설정</span></div>
-    <div class="settings-body" style="padding:14px">
+    <div class="settings-body" style="padding:18px;display:flex;flex-direction:column;gap:20px;max-width:480px">
       <div class="settings-row">
         <div class="settings-label">화면 모드</div>
-        <div class="settings-opts cols3">
-          <button class="sopt" id="sopt-dark2"   onclick="setTheme('dark')">🌙 다크</button>
-          <button class="sopt" id="sopt-light2"  onclick="setTheme('light')">☀️ 라이트</button>
-          <button class="sopt" id="sopt-system2" onclick="setTheme('system')">💻 시스템</button>
-        </div>
-      </div>
-      <div class="settings-row" style="margin-top:12px">
-        <div class="settings-label">메뉴 위치</div>
-        <div class="settings-opts cols4">
-          <button class="sopt" id="sopt-nav-bottom2" onclick="setNavPos('bottom')">↓ 하단</button>
-          <button class="sopt" id="sopt-nav-top2"    onclick="setNavPos('top')">↑ 상단</button>
-          <button class="sopt" id="sopt-nav-left2"   onclick="setNavPos('left')">← 좌측</button>
-          <button class="sopt" id="sopt-nav-right2"  onclick="setNavPos('right')">→ 우측</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</div><!-- /main -->
-</div><!-- /content-wrap -->
-
-<!-- SETTINGS MODAL (모바일용) -->
-<div class="settings-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()">
-  <div class="settings-panel">
-    <div class="settings-hd">
-      <span class="settings-title">⚙ 설정</span>
-      <button class="settings-close" onclick="closeSettings()">✕</button>
-    </div>
-    <div class="settings-body" id="settingsBodyModal">
-      <div class="settings-row">
-        <div class="settings-label">화면 모드</div>
-        <div class="settings-opts cols3">
+        <div class="settings-opts cols3" style="margin-top:8px">
           <button class="sopt" id="sopt-dark"   onclick="setTheme('dark')">🌙 다크</button>
           <button class="sopt" id="sopt-light"  onclick="setTheme('light')">☀️ 라이트</button>
           <button class="sopt" id="sopt-system" onclick="setTheme('system')">💻 시스템</button>
@@ -1012,7 +977,7 @@ body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
       </div>
       <div class="settings-row">
         <div class="settings-label">메뉴 위치</div>
-        <div class="settings-opts cols4">
+        <div class="settings-opts cols4" style="margin-top:8px">
           <button class="sopt" id="sopt-nav-bottom" onclick="setNavPos('bottom')">↓ 하단</button>
           <button class="sopt" id="sopt-nav-top"    onclick="setNavPos('top')">↑ 상단</button>
           <button class="sopt" id="sopt-nav-left"   onclick="setNavPos('left')">← 좌측</button>
@@ -1023,13 +988,18 @@ body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
   </div>
 </div>
 
+</div><!-- /main -->
+</div><!-- /content-wrap -->
+
+
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <button class="nav-btn active" onclick="goPage(&#39;new&#39;,this)"><span class="nav-icon">✏️</span>NEW</button>
-  <button class="nav-btn" onclick="goPage(&#39;history&#39;,this)"><span class="nav-icon">📋</span>HISTORY</button>
-  <button class="nav-btn" onclick="goPage(&#39;dash&#39;,this)"><span class="nav-icon">📊</span>DASH</button>
-  <button class="nav-btn" onclick="goPage(&#39;weekly&#39;,this)"><span class="nav-icon">📅</span>WEEKLY</button>
-  <button class="nav-btn" onclick="goPage(&#39;calc&#39;,this)"><span class="nav-icon">🧮</span>CALC</button>
+  <button class="nav-btn active" onclick="goPage('new',this)"><span class="nav-icon">✏️</span>NEW</button>
+  <button class="nav-btn" onclick="goPage('history',this)"><span class="nav-icon">📋</span>HISTORY</button>
+  <button class="nav-btn" onclick="goPage('dash',this)"><span class="nav-icon">📊</span>DASH</button>
+  <button class="nav-btn" onclick="goPage('weekly',this)"><span class="nav-icon">📅</span>WEEKLY</button>
+  <button class="nav-btn" onclick="goPage('calc',this)"><span class="nav-icon">🧮</span>CALC</button>
+  <button class="nav-btn" onclick="goPage('setting',this)"><span class="nav-icon">⚙️</span>SETTING</button>
 </div>
 
 <!-- IMG MODAL -->
@@ -1059,21 +1029,16 @@ let checkedRules       = [];    // number[] (0~5)
 
 // ── SETTINGS ──
 function openSettings() {
-  document.getElementById('settingsOv').classList.add('open');
-  updateSettingsUI();
+  // SETTING 탭으로 이동
+  const btn = document.querySelector('.nav-btn:last-child');
+  if (btn) goPage('setting', btn);
 }
-function closeSettings() {
-  document.getElementById('settingsOv').classList.remove('open');
-}
+function closeSettings() {} // 더 이상 사용 안 함
 function updateSettingsUI() {
   const theme  = localStorage.getItem('mj_theme')  || 'dark';
   const navPos = localStorage.getItem('mj_navpos') || 'bottom';
-  // 모달 버튼
   ['dark','light','system'].forEach(t => document.getElementById('sopt-'+t)?.classList.toggle('active', t===theme));
   ['bottom','top','left','right'].forEach(p => document.getElementById('sopt-nav-'+p)?.classList.toggle('active', p===navPos));
-  // 사이드바 버튼
-  ['dark','light','system'].forEach(t => document.getElementById('sopt-'+t+'2')?.classList.toggle('active', t===theme));
-  ['bottom','top','left','right'].forEach(p => document.getElementById('sopt-nav-'+p+'2')?.classList.toggle('active', p===navPos));
 }
 function setTheme(theme) {
   localStorage.setItem('mj_theme', theme);
@@ -1131,6 +1096,7 @@ function goPage(id, btn) {
   if (id === 'history') renderHistory();
   if (id === 'dash')    renderDash();
   if (id === 'weekly')  renderWeekly();
+  if (id === 'setting') updateSettingsUI();
   updateSplitView(id);
 }
 
@@ -1996,6 +1962,23 @@ function getWeek(ds) {
   return `${d.getFullYear()}-W${String(w).padStart(2,'0')}`;
 }
 
+function fmtWeekLabel(w) {
+  // "2026-W19" → "2026년 19주 (05/06~05/12)"
+  try {
+    const [year, wn] = w.split('-W');
+    const weekNum = parseInt(wn);
+    // 해당 주의 월요일 계산
+    const jan4 = new Date(parseInt(year), 0, 4);
+    const dayOfWeek = jan4.getDay() || 7;
+    const monday = new Date(jan4);
+    monday.setDate(jan4.getDate() - dayOfWeek + 1 + (weekNum - 1) * 7);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const fmt = d => `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+    return `${year}년 ${weekNum}주차  ${fmt(monday)}~${fmt(sunday)}`;
+  } catch(e) { return w; }
+}
+
 function renderWeekly() {
   const byW = {};
   trades.forEach(t => {
@@ -2039,7 +2022,7 @@ function renderWeekly() {
 
     return `<div class="week-card">
       <div class="week-hd">
-        <span class="week-label">◼ ${w}</span>
+        <span class="week-label">◼ ${fmtWeekLabel(w)}</span>
         <span style="font-family:var(--mono);font-size:.78em;color:var(--text-2)">${list.length}거래</span>
       </div>
       <div class="week-body">
