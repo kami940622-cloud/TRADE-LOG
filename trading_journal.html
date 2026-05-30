@@ -1639,7 +1639,11 @@ function setFilter(f, btn) {
 function renderHistory() {
   const q    = (document.getElementById('searchInput')?.value || '').toUpperCase();
   const sort = document.getElementById('sortSel')?.value || 'date-desc';
-  let list   = trades.filter(t => currentFilter === 'all' || t.result === currentFilter);
+  let list   = trades.filter(t => {
+    if (currentFilter === 'all')    return t.result !== 'ACTIVE'; // 전체 = 완료된 것만
+    if (currentFilter === 'ACTIVE') return t.result === 'ACTIVE'; // 진행중
+    return t.result === currentFilter;
+  });
   if (q) list = list.filter(t => t.coin.includes(q));
 
   // 정렬
@@ -1734,14 +1738,20 @@ function renderHistory() {
     const exitedAmt = (t.partialExits||[]).filter(e=>e.amount>0).reduce((s,e)=>s+(e.amount||0),0);
     const remainAmt = Math.max(0,(t.amount||0)-exitedAmt);
     const exitedPct = t.amount>0 ? (exitedAmt/t.amount*100).toFixed(0) : 0;
-    const exitRecordsHtml = (t.partialExits||[]).filter(e=>e.amount>0).map((e,i)=>`
+    const exitRecordsHtml = (t.partialExits||[]).filter(e=>e.amount>0).map((e,i)=>{
+      const ep=Number(e.price||0), ea=Number(e.amount||0), ent=Number(t.entry||0);
+      const epnl = t.ls==='SHORT' ? (ent-ep)*ea : (ep-ent)*ea;
+      const pnlStr = (epnl>=0?'+':'')+epnl.toFixed(2);
+      const pnlColor = epnl>=0?'var(--green)':'var(--red)';
+      return `
       <div class="exit-record">
         <span class="exit-rec-label">${i+1}차</span>
         <span class="exit-rec-type" style="color:${e.type==='SL'?'var(--red)':'var(--green)'}">${e.type||'TP'}</span>
-        <span class="exit-rec-price">${e.price?.toLocaleString('en-US',{maximumFractionDigits:6})||'—'}</span>
-        <span class="exit-rec-amt">${e.amount?.toFixed(4)||'—'} (${e.pct||0}%)</span>
+        <span class="exit-rec-price">${ep.toLocaleString('en-US',{maximumFractionDigits:6})}</span>
+        <span style="font-family:var(--mono);font-size:.75em;font-weight:600;color:${pnlColor};flex:1">${pnlStr}</span>
+        <span class="exit-rec-amt">${ea.toFixed(4)} (${e.pct||0}%)</span>
         <button class="exit-rec-del" onclick="removeExitFromTrade('${t.id}',${i})">✕</button>
-      </div>`).join('');
+      </div>`;}).join('');
     const exitSection = t.result==='ACTIVE' ? `
       <div class="exit-section" id="exitsec-${t.id}">
         <div style="font-family:var(--mono);font-size:.62em;color:var(--green);letter-spacing:1px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(48,209,88,.2)">
@@ -1801,7 +1811,7 @@ function renderHistory() {
           <div class="info-item"><div class="info-label">평균청산가</div><div class="info-value ${t.exit ? 'green' : ''}">${t.exit?.toLocaleString('en-US',{maximumFractionDigits:4}) || '—'}</div></div>
           <div class="info-item"><div class="info-label">P&L</div><div class="info-value ${pnlCls}">${pnlTxt}</div></div>
           <div class="info-item"><div class="info-label">ROI</div><div class="info-value ${pnlCls}">${roiTxt}</div></div>
-          <div class="info-item"><div class="info-label">수량</div><div class="info-value">${t.amount?.toFixed ? t.amount.toFixed(4) : (t.amount || '—')}</div></div>
+          <div class="info-item"><div class="info-label">${t.result==='ACTIVE'&&exitedAmt>0?'남은수량':'수량'}</div><div class="info-value ${t.result==='ACTIVE'&&exitedAmt>0?'ora':''}">${t.result==='ACTIVE'&&exitedAmt>0 ? remainAmt.toFixed(4) : (t.amount?.toFixed ? t.amount.toFixed(4) : (t.amount||'—'))}</div></div>
         </div>
         ${reasonHtml}
         ${imgHtml}
@@ -1921,9 +1931,17 @@ function saveExitToTrade(id) {
   t.pnl   = (t.ls==='SHORT' ? (t.entry-avgExit) : (avgExit-t.entry)) * totalExitAmt;
   t.roi   = (t.ls==='SHORT' ? (t.entry-avgExit) : (avgExit-t.entry)) / t.entry * 100;
   t.dur   = (t.xDate&&t.eDate) ? (new Date(t.xDate)-new Date(t.eDate))/3600000 : null;
+  // 수량 0 → 자동 WIN/LOSE
+  const newExited = (t.partialExits||[]).filter(e=>e.amount>0).reduce((s,e)=>s+(e.amount||0),0);
+  const newRemain = Math.max(0,(t.amount||0)-newExited);
+  if (newRemain < 0.0001) {
+    t.result = (t.pnl||0) >= 0 ? 'WIN' : 'LOSE';
+    save();
+    renderHistory();
+    return;
+  }
   save();
   renderHistory();
-  // 저장 후 해당 섹션 자동 재오픈
   setTimeout(() => {
     const sec = document.getElementById('exitsec-'+id);
     if (sec) sec.classList.add('open');
