@@ -483,6 +483,33 @@ body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
 .badge.rule-ok{border:1px solid rgba(48,209,88,.2);color:var(--green)}
 .badge.rule-warn{border:1px solid rgba(255,69,58,.15);color:rgba(255,69,58,.8)}
 
+/* ── PARTIAL EXIT SECTION (HISTORY) ── */
+.exit-section{border-top:1px solid var(--border);padding:12px 14px;display:none;background:rgba(48,209,88,.02)}
+.exit-section.open{display:block}
+.exit-btn{background:transparent;border:1px solid rgba(48,209,88,.35);color:var(--green);height:26px;padding:0 10px;font-family:var(--mono);font-size:.6em;border-radius:6px;cursor:pointer;transition:all .2s;flex-shrink:0}
+.exit-btn:hover,.exit-btn:active{border-color:var(--green);box-shadow:0 0 8px rgba(48,209,88,.15)}
+.exit-records{margin-bottom:10px}
+.exit-record{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)}
+.exit-record:last-child{border-bottom:none}
+.exit-rec-label{font-family:var(--mono);font-size:.58em;color:var(--text-3);width:24px;flex-shrink:0}
+.exit-rec-type{font-family:var(--mono);font-size:.68em;font-weight:700;width:32px;flex-shrink:0}
+.exit-rec-price{font-family:var(--mono);font-size:.78em;color:var(--text);flex:1}
+.exit-rec-amt{font-family:var(--mono);font-size:.68em;color:var(--text-2)}
+.exit-rec-del{background:transparent;border:1px solid var(--border2);color:var(--text-3);width:24px;height:24px;border-radius:5px;cursor:pointer;font-size:.7em;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.exit-rec-del:hover{border-color:var(--red);color:var(--red)}
+.exit-add-form{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.exit-form-grid{display:grid;grid-template-columns:1fr 1fr 58px;gap:6px;margin-bottom:6px}
+.exit-form-grid2{display:grid;grid-template-columns:1fr 70px;gap:6px;margin-bottom:8px}
+.exit-inp{background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 8px;height:38px;font-family:var(--mono);font-size:.78em;border-radius:7px;outline:none;width:100%;transition:all .2s}
+.exit-inp:focus{border-color:var(--green);box-shadow:0 0 0 1px rgba(48,209,88,.15)}
+.exit-type-sel{background:#0d0d0d;border:1px solid var(--border2);color:var(--text);height:38px;font-family:var(--mono);font-size:.7em;border-radius:7px;outline:none;width:100%;-webkit-appearance:none;padding:0 6px;transition:all .2s}
+.exit-remain{font-family:var(--mono);font-size:.62em;color:var(--text-3);margin-bottom:8px}
+.exit-remain span{color:var(--orange);font-weight:600}
+.exit-save-btn{width:100%;height:38px;background:transparent;border:1px solid rgba(48,209,88,.4);color:var(--green);font-family:var(--mono);font-size:.7em;letter-spacing:1px;border-radius:8px;cursor:pointer;transition:all .2s}
+.exit-save-btn:hover{background:rgba(48,209,88,.06);box-shadow:0 0 10px rgba(48,209,88,.1)}
+.exit-result-sel{display:flex;gap:6px;margin-top:8px}
+.exit-result-sel .wld-btn{flex:1;height:40px;font-size:.72em}
+
 /* ── BUTTON OVERRIDES (minimal premium) ── */
 .btn{transition:all .2s}
 .btn-primary{background:transparent;border:1px solid var(--orange);color:var(--orange)}
@@ -1632,6 +1659,49 @@ function renderHistory() {
 
     const hasDetail = peHtml || pxHtml || badgeHtml;
 
+    // 청산 섹션 (ACTIVE만)
+    const exitedAmt = (t.partialExits||[]).filter(e=>e.amount>0).reduce((s,e)=>s+(e.amount||0),0);
+    const remainAmt = Math.max(0,(t.amount||0)-exitedAmt);
+    const exitedPct = t.amount>0 ? (exitedAmt/t.amount*100).toFixed(0) : 0;
+    const exitRecordsHtml = (t.partialExits||[]).filter(e=>e.amount>0).map((e,i)=>`
+      <div class="exit-record">
+        <span class="exit-rec-label">${i+1}차</span>
+        <span class="exit-rec-type" style="color:${e.type==='SL'?'var(--red)':'var(--green)'}">${e.type||'TP'}</span>
+        <span class="exit-rec-price">${e.price?.toLocaleString('en-US',{maximumFractionDigits:6})||'—'}</span>
+        <span class="exit-rec-amt">${e.amount?.toFixed(4)||'—'} (${e.pct||0}%)</span>
+        <button class="exit-rec-del" onclick="removeExitFromTrade('${t.id}',${i})">✕</button>
+      </div>`).join('');
+    const exitSection = t.result==='ACTIVE' ? `
+      <div class="exit-section" id="exitsec-${t.id}">
+        ${exitRecordsHtml ? `<div class="exit-records">${exitRecordsHtml}</div>` : ''}
+        <div class="exit-remain">남은 수량: <span>${remainAmt.toFixed(4)}</span> (${100-parseInt(exitedPct)}%)</div>
+        <div class="exit-add-form">
+          <div class="exit-form-grid">
+            <input class="exit-inp" type="number" placeholder="청산가" inputmode="decimal" id="ex-price-${t.id}">
+            <input class="exit-inp" type="number" placeholder="수량" inputmode="decimal" id="ex-amt-${t.id}" oninput="syncEFAmt('${t.id}',false)">
+            <input class="exit-inp" type="number" placeholder="%" inputmode="decimal" id="ex-pct-${t.id}" oninput="syncEFAmt('${t.id}',true)">
+          </div>
+          <div class="exit-form-grid2">
+            <select class="exit-type-sel" id="ex-type-${t.id}">
+              <option value="TP">✅ TP 익절</option>
+              <option value="SL">🔴 SL 손절</option>
+            </select>
+            <div style="display:flex;gap:4px">
+              <input type="datetime-local" id="ex-date-${t.id}" style="flex:1;height:38px;font-size:.7em;background:#0d0d0d;border:1px solid var(--border2);color:var(--text);border-radius:7px;outline:none;padding:0 6px">
+              <button class="now-btn" style="height:38px;font-size:.55em;padding:0 6px;flex-shrink:0" onclick="setNow('ex-date-${t.id}')">NOW</button>
+            </div>
+          </div>
+          <button class="exit-save-btn" onclick="saveExitToTrade('${t.id}')">+ 청산 저장</button>
+          ${remainAmt<=0 ? `
+          <div style="font-family:var(--mono);font-size:.65em;color:var(--orange);margin-top:8px;margin-bottom:6px">✅ 전량 청산 완료 — 결과를 선택하세요</div>
+          <div class="exit-result-sel">
+            <button class="wld-btn" onclick="finalizeExit('${t.id}','WIN')">✅ WIN</button>
+            <button class="wld-btn" onclick="finalizeExit('${t.id}','DRAW')">➖ DRAW</button>
+            <button class="wld-btn" onclick="finalizeExit('${t.id}','LOSE')">❌ LOSE</button>
+          </div>` : ''}
+        </div>
+      </div>` : '';
+
     return `
     <div class="trade-card" id="card-${t.id}">
       <div class="tc-hd">
@@ -1639,6 +1709,7 @@ function renderHistory() {
         <span class="tc-ls ${(t.ls||'LONG').toLowerCase()}">${t.ls||'LONG'}</span>
         <span class="tc-date">${t.eDate ? t.eDate.replace('T',' ').slice(0,16) : ''}</span>
         ${hasDetail ? `<button class="detail-toggle" onclick="toggleDetail('${t.id}')">상세 ▶</button>` : ''}
+        ${t.result==='ACTIVE' ? `<button class="exit-btn" onclick="toggleExitSection('${t.id}')">청산 +</button>` : ''}
         <button class="tc-edit-btn" onclick="toggleEdit('${t.id}')">수정</button>
         <button class="tc-edit-btn del" onclick="delTrade('${t.id}')">삭제</button>
       </div>
@@ -1663,6 +1734,7 @@ function renderHistory() {
         ${peHtml}${pxHtml}
         ${badgeHtml ? `<div class="badge-row">${badgeHtml}</div>` : ''}
       </div>
+      ${exitSection}
       <div class="edit-form" id="edit-${t.id}">
         <div style="font-family:var(--mono);font-size:.65em;letter-spacing:2px;color:var(--orange);margin-bottom:4px">▶ 결과 선택</div>
         <div class="wld" id="wld-${t.id}">
@@ -1700,6 +1772,81 @@ function renderHistory() {
       </div>
     </div>`;
   }).join('');
+}
+
+// ── 청산 섹션 토글 ──
+function toggleExitSection(id) {
+  const sec = document.getElementById('exitsec-' + id);
+  if (!sec) return;
+  sec.classList.toggle('open');
+  // 날짜 자동설정
+  const dateEl = document.getElementById('ex-date-' + id);
+  if (dateEl && !dateEl.value) setNow('ex-date-' + id);
+}
+
+// 퍼센트↔수량 양방향
+function syncEFAmt(id, pctChanged) {
+  const t = trades.find(x => x.id === id); if (!t) return;
+  const exitedAmt = (t.partialExits||[]).filter(e=>e.amount>0).reduce((s,e)=>s+(e.amount||0),0);
+  const remain = Math.max(0,(t.amount||0)-exitedAmt);
+  const pctEl = document.getElementById('ex-pct-'+id);
+  const amtEl = document.getElementById('ex-amt-'+id);
+  if (!pctEl || !amtEl) return;
+  if (pctChanged) {
+    const pct = parseFloat(pctEl.value)||0;
+    amtEl.value = pct>0 ? (remain*pct/100).toFixed(4) : '';
+  } else {
+    const amt = parseFloat(amtEl.value)||0;
+    pctEl.value = (remain>0&&amt>0) ? (amt/remain*100).toFixed(0) : '';
+  }
+}
+
+// 청산 저장
+function saveExitToTrade(id) {
+  const t = trades.find(x => x.id === id); if (!t) return;
+  const price = parseFloat(document.getElementById('ex-price-'+id)?.value)||0;
+  const amt   = parseFloat(document.getElementById('ex-amt-'+id)?.value)||0;
+  const pct   = parseFloat(document.getElementById('ex-pct-'+id)?.value)||0;
+  const type  = document.getElementById('ex-type-'+id)?.value||'TP';
+  const date  = document.getElementById('ex-date-'+id)?.value||'';
+  if (!price||!amt) { alert('청산가와 수량을 입력해주세요'); return; }
+
+  if (!t.partialExits) t.partialExits = [];
+  t.partialExits.push({ price, amount:amt, pct:pct||0, date, type });
+
+  // 평균 청산가/PNL/ROI 재계산
+  const valid = t.partialExits.filter(e=>e.price>0&&e.amount>0);
+  const totalExitAmt = valid.reduce((s,e)=>s+(e.amount||0),0);
+  const avgExit = valid.reduce((s,e)=>s+e.price*e.amount,0)/totalExitAmt;
+  t.exit  = avgExit;
+  t.xDate = date || t.xDate;
+  t.pnl   = (t.ls==='SHORT' ? (t.entry-avgExit) : (avgExit-t.entry)) * totalExitAmt;
+  t.roi   = (t.ls==='SHORT' ? (t.entry-avgExit) : (avgExit-t.entry)) / t.entry * 100;
+  t.dur   = (t.xDate&&t.eDate) ? (new Date(t.xDate)-new Date(t.eDate))/3600000 : null;
+  save(); renderHistory();
+}
+
+// 청산 기록 삭제
+function removeExitFromTrade(id, idx) {
+  const t = trades.find(x=>x.id===id); if (!t) return;
+  t.partialExits.splice(idx,1);
+  if (!t.partialExits.length) { t.exit=null; t.pnl=null; t.roi=null; }
+  else {
+    const valid = t.partialExits.filter(e=>e.price>0&&e.amount>0);
+    const totalAmt = valid.reduce((s,e)=>s+e.amount,0);
+    const avg = valid.reduce((s,e)=>s+e.price*e.amount,0)/totalAmt;
+    t.exit = avg;
+    t.pnl  = (t.ls==='SHORT'?(t.entry-avg):(avg-t.entry))*totalAmt;
+    t.roi  = (t.ls==='SHORT'?(t.entry-avg):(avg-t.entry))/t.entry*100;
+  }
+  save(); renderHistory();
+}
+
+// 거래 종료 처리
+function finalizeExit(id, result) {
+  const t = trades.find(x=>x.id===id); if (!t) return;
+  t.result = result;
+  save(); renderHistory();
 }
 
 function toggleDetail(id) {
