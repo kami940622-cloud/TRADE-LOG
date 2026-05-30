@@ -815,7 +815,6 @@ body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
     <button class="filter-tab active" onclick="setFilter(&#39;all&#39;,this)">전체</button>
     <button class="filter-tab" onclick="setFilter(&#39;ACTIVE&#39;,this)">진행중</button>
     <button class="filter-tab" onclick="setFilter(&#39;WIN&#39;,this)">✅ WIN</button>
-    <button class="filter-tab" onclick="setFilter(&#39;DRAW&#39;,this)">➖ DRAW</button>
     <button class="filter-tab" onclick="setFilter(&#39;LOSE&#39;,this)">❌ LOSE</button>
   </div>
   <div id="tradeList"></div>
@@ -1669,7 +1668,7 @@ function renderHistory() {
     const durTxt = fmtDur(t.dur);
 
     const badgeCls = {WIN:'win', DRAW:'draw', LOSE:'lose', ACTIVE:'active'}[t.result] || 'active';
-    const badgeTxt = {WIN:'✅ WIN', DRAW:'➖ DRAW', LOSE:'❌ LOSE', ACTIVE:'🔄 진행중'}[t.result];
+    const badgeTxt = {WIN:'✅ WIN', DRAW:'➖ WIN/LOSE', LOSE:'❌ LOSE', ACTIVE:'🔄 진행중'}[t.result];
 
     const imgHtml = t.imgs?.length
       ? `<div class="tc-imgs">${t.imgs.map(s => `<img class="ss-thumb" src="${s}" onclick="openImg('${s}')">`).join('')}</div>`
@@ -1696,17 +1695,26 @@ function renderHistory() {
         </table>
       </div>` : '';
 
-    const pxHtml = t.partialExits?.length > 1 ? `
+    const pxHtml = (t.partialExits||[]).filter(e=>e.amount>0).length > 0 ? `
       <div style="margin-bottom:8px">
         <div style="font-family:var(--mono);font-size:.58em;letter-spacing:1.5px;color:var(--green);margin-bottom:4px">분할청산</div>
         <table class="partial-table">
-          <tr><th>구분</th><th>청산가</th><th>수량</th><th>유형</th></tr>
-          ${t.partialExits.map((e,i) => `<tr>
-            <td>${i+1}차</td>
-            <td>${e.price?.toLocaleString('en-US',{maximumFractionDigits:4})||'—'}</td>
-            <td>${e.amount?.toFixed(4)||'—'}</td>
-            <td style="color:${e.type==='SL'?'var(--red)':'var(--green)'}">${e.type||'TP'}</td>
-          </tr>`).join('')}
+          <tr><th>구분</th><th>청산가</th><th>수량</th><th>유형</th><th>수익</th></tr>
+          ${(t.partialExits||[]).filter(e=>e.amount>0).map((e,i) => {
+            const ep = Number(e.price||0);
+            const ea = Number(e.amount||0);
+            const ent = Number(t.entry||0);
+            const epnl = t.ls==='SHORT' ? (ent-ep)*ea : (ep-ent)*ea;
+            const pnlCls = epnl>=0?'color:var(--green)':'color:var(--red)';
+            const pnlStr = (epnl>=0?'+':'')+epnl.toFixed(2);
+            return `<tr>
+              <td>${i+1}차</td>
+              <td>${ep.toLocaleString('en-US',{maximumFractionDigits:4})}</td>
+              <td>${ea.toFixed(4)}</td>
+              <td style="${e.type==='SL'?'color:var(--red)':'color:var(--green)'}">${e.type||'TP'}</td>
+              <td style="font-weight:600;${pnlCls}">${pnlStr}</td>
+            </tr>`;
+          }).join('')}
         </table>
       </div>` : '';
 
@@ -1736,6 +1744,9 @@ function renderHistory() {
       </div>`).join('');
     const exitSection = t.result==='ACTIVE' ? `
       <div class="exit-section" id="exitsec-${t.id}">
+        <div style="font-family:var(--mono);font-size:.62em;color:var(--green);letter-spacing:1px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(48,209,88,.2)">
+          📌 ${t.coin} ${t.ls||'LONG'} ${(t.entry||0).toLocaleString()} — 청산 기록
+        </div>
         ${exitRecordsHtml ? `<div class="exit-records">${exitRecordsHtml}</div>` : ''}
         <div class="exit-remain">남은 수량: <span>${remainAmt.toFixed(4)}</span> (${100-parseInt(exitedPct)}%)</div>
         <div class="exit-add-form">
@@ -1762,7 +1773,6 @@ function renderHistory() {
           <div style="font-family:var(--mono);font-size:.65em;color:var(--orange);margin-top:8px;margin-bottom:6px">✅ 전량 청산 완료 — 결과를 선택하세요</div>
           <div class="exit-result-sel">
             <button class="wld-btn" onclick="finalizeExit('${t.id}','WIN')">✅ WIN</button>
-            <button class="wld-btn" onclick="finalizeExit('${t.id}','DRAW')">➖ DRAW</button>
             <button class="wld-btn" onclick="finalizeExit('${t.id}','LOSE')">❌ LOSE</button>
           </div>` : ''}
         </div>
@@ -1805,7 +1815,6 @@ function renderHistory() {
         <div style="font-family:var(--mono);font-size:.65em;letter-spacing:2px;color:var(--orange);margin-bottom:4px">▶ 결과 선택</div>
         <div class="wld" id="wld-${t.id}">
           <button class="wld-btn ${t.result==='WIN'?'sw':''}"  onclick="setResult('${t.id}','WIN')">✅ WIN</button>
-          <button class="wld-btn ${t.result==='DRAW'?'sd':''}" onclick="setResult('${t.id}','DRAW')">➖ DRAW</button>
           <button class="wld-btn ${t.result==='LOSE'?'sl':''}" onclick="setResult('${t.id}','LOSE')">❌ LOSE</button>
         </div>
         <div class="form-row">
@@ -1967,8 +1976,8 @@ function toggleEdit(id) {
 function setResult(id, result) {
   const form = document.getElementById('edit-' + id);
   form.querySelectorAll('.wld-btn').forEach(b => { b.className = 'wld-btn'; });
-  const map = {WIN:'sw', DRAW:'sd', LOSE:'sl'};
-  form.querySelector(`.wld-btn:nth-child(${result==='WIN'?1:result==='DRAW'?2:3})`).classList.add(map[result]);
+  const map = {WIN:'sw', LOSE:'sl'};
+  form.querySelector(`.wld-btn:nth-child(${result==='WIN'?1:2})`).classList.add(map[result]||'sl');
   form.dataset.result = result;
 }
 
