@@ -25,29 +25,44 @@
 html{height:100%}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;padding-bottom:90px;overscroll-behavior:none}
 
-/* ── LIGHT THEME ── */
+/* ── IVORY LIGHT THEME ── */
 body.light-theme{
-  --bg:#f8f8f5;--surface:#fff;--panel:#f0f0ec;--panel2:#e8e8e4;
-  --border:#d8d8d4;--border2:#c8c8c4;
-  --text:#1a1a18;--text-2:#555552;--text-3:#989894;
-  --orange:#c87000;--orange2:#e08000;--orange-d:rgba(200,112,0,.12);
-  --green:#1a7a3a;--green-d:rgba(26,122,58,.1);
-  --red:#cc2222;--red-d:rgba(204,34,34,.1);
-  --blue:#0060cc;--blue-d:rgba(0,96,204,.1);
-  --gray-d:rgba(100,100,100,.1);
+  --bg:#fdf6ec;--surface:#fff9f2;--panel:#f8f0e0;--panel2:#f0e4cc;
+  --border:#ddd0b8;--border2:#ccc0a4;
+  --text:#2a1e0e;--text-2:#6a5030;--text-3:#a08860;
+  --orange:#c87000;--orange2:#e08000;--orange-d:rgba(200,112,0,.15);
+  --green:#1a6830;--green-d:rgba(26,104,48,.12);
+  --red:#c82020;--red-d:rgba(200,32,32,.1);
+  --blue:#0055bb;--blue-d:rgba(0,85,187,.1);
+  --gray-d:rgba(120,90,50,.08);
 }
+/* 라이트: 어두운 배경 요소들 재정의 */
+body.light-theme #tickerBar{background:#2a1e0e;border-bottom-color:#4a3820}
 body.light-theme .fg input,
 body.light-theme .fg select,
-body.light-theme .fg textarea,
+body.light-theme .fg textarea{background:#fff9f2}
 body.light-theme .partial-input,
 body.light-theme .partial-pct,
-body.light-theme .partial-type,
-body.light-theme .buy-input,
+body.light-theme .partial-type{background:#fff9f2}
+body.light-theme .buy-input{background:#fff9f2}
 body.light-theme .ls-btn,
-body.light-theme .review-area{background:#fff}
-body.light-theme .header{background:var(--orange)}
-body.light-theme .hstat-value{color:#000}
-body.light-theme .hstat-label{color:rgba(0,0,0,.5)}
+body.light-theme .coin-trigger,
+body.light-theme .coin-add-input{background:#fff9f2}
+body.light-theme .coin-dd{background:#f8f0e0}
+body.light-theme .coin-opt{background:#f8f0e0;border-bottom-color:var(--border)}
+body.light-theme .coin-opt:hover{background:var(--orange-d)}
+body.light-theme .coin-opt.sel{background:rgba(200,112,0,.08)}
+body.light-theme .review-area{background:#fff9f2}
+body.light-theme .search-input,
+body.light-theme .sort-sel{background:#f8f0e0}
+body.light-theme .rule-trigger,
+body.light-theme .rule-item{background:#fff9f2}
+body.light-theme .tag-btn,
+body.light-theme .seg-btn{background:#fff9f2}
+body.light-theme .wld-btn{background:#f8f0e0}
+body.light-theme .edit-form{background:rgba(200,112,0,.03)}
+body.light-theme .bottom-nav{background:#f8f0e0;border-top-color:var(--border)}
+body.light-theme .modal-ov{background:rgba(40,25,10,.75)}
 
 /* ── SETTINGS MODAL ── */
 .settings-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
@@ -77,8 +92,23 @@ body.light-theme .hstat-label{color:rgba(0,0,0,.5)}
 .data-btn-settings{background:rgba(0,0,0,.6);border:1px solid rgba(255,149,0,.4);color:var(--orange)}
 .data-btn-settings:hover{border-color:var(--orange);box-shadow:0 0 10px rgba(255,149,0,.15)}
 
+/* ── APP SHELL (줌 고정 핵심) ── */
+html,body{height:100%;overflow:hidden}
+body{display:flex;flex-direction:column}
+.top-bar{flex-shrink:0;z-index:200;position:relative}
+.content-wrap{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;-webkit-overflow-scrolling:touch;overscroll-behavior:none}
+/* 설정 사이드바 */
+.settings-sidebar{display:none}
+@media(min-width:1024px){
+  .settings-sidebar{display:block}
+  .main.split-view{display:grid;grid-template-columns:1fr 360px 220px;gap:16px;align-items:start}
+  .main.split-view .page.active{grid-column:1}
+  .main.split-view #page-calc{display:block!important;grid-column:2;grid-row:1;position:sticky;top:16px}
+  .main.split-view .settings-sidebar{grid-column:3;grid-row:1;position:sticky;top:16px}
+}
+
 /* HEADER */
-.header{background:var(--orange);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:200}
+.header{background:var(--orange);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:200}
 .header-logo{font-family:var(--mono);font-weight:700;font-size:1.05em;color:#000;letter-spacing:2px;display:flex;align-items:center;gap:10px}
 .logo-sq{width:20px;height:20px;background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo-sq::after{content:'';width:9px;height:9px;background:var(--orange);display:block}
@@ -90,38 +120,52 @@ body.light-theme .hstat-label{color:rgba(0,0,0,.5)}
 .hstat-value.neg{color:#7a0000}
 
 /* TICKER */
-#tickerBar{background:#000;border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;position:fixed;top:54px;left:0;right:0;z-index:199}
+#tickerBar{background:#000;border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;position:relative;z-index:199}
 #tickerBar::-webkit-scrollbar{display:none}
 
-/* BOTTOM NAV — 하단(기본) */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:82px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:150;padding-bottom:env(safe-area-inset-bottom);transition:all .25s}
+/* ── DATA BUTTONS (티커 내부) ── */
+.data-btns{display:flex;gap:5px;flex-shrink:0;padding-left:10px}
+.data-btn{height:26px;padding:0 9px;border-radius:5px;font-family:var(--mono);font-size:.56em;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.data-btn-backup{background:transparent;border:1px solid rgba(10,132,255,.4);color:var(--blue)}
+.data-btn-backup:hover{border-color:var(--blue);box-shadow:0 0 8px rgba(10,132,255,.15)}
+.data-btn-restore{background:transparent;border:1px solid rgba(48,209,88,.4);color:var(--green)}
+.data-btn-restore:hover{border-color:var(--green);box-shadow:0 0 8px rgba(48,209,88,.15)}
+.data-btn-settings{background:transparent;border:1px solid rgba(255,149,0,.4);color:var(--orange)}
+.data-btn-settings:hover{border-color:var(--orange);box-shadow:0 0 8px rgba(255,149,0,.15)}
+
+/* BOTTOM NAV */
+.bottom-nav{flex-shrink:0;height:82px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:150;padding-bottom:env(safe-area-inset-bottom)}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:none;border:none;color:var(--text-3);cursor:pointer;font-family:var(--mono);font-size:.58em;letter-spacing:1px;text-transform:uppercase;transition:color .15s;padding:8px 0;position:relative}
 .nav-btn::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--orange);transform:scaleX(0);transition:transform .2s;border-radius:0 0 3px 3px}
 .nav-btn.active{color:var(--orange)}
 .nav-btn.active::before{transform:scaleX(1)}
 .nav-icon{font-size:1.6em;line-height:1}
 
-/* NAV — 상단 */
-body.nav-top .bottom-nav{bottom:auto;top:106px;border-top:none;border-bottom:1px solid var(--border);padding-bottom:0}
+/* NAV — 상단: body flex order 변경 */
+body.nav-top{flex-direction:column}
+body.nav-top .bottom-nav{order:-1;border-top:none;border-bottom:1px solid var(--border);padding-bottom:0}
 body.nav-top .bottom-nav .nav-btn::before{top:auto;bottom:0;border-radius:3px 3px 0 0}
-body.nav-top .main{padding-top:calc(106px + 82px + 8px);padding-bottom:16px}
 
-/* NAV — 좌측 */
-body.nav-left .bottom-nav{bottom:0;top:106px;left:0;right:auto;width:70px;height:auto;flex-direction:column;border-top:none;border-right:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
-body.nav-left .bottom-nav .nav-btn::before{top:0;bottom:0;left:0;right:auto;width:2px;height:auto;transform:scaleY(0);transition:transform .2s;border-radius:0 3px 3px 0}
+/* NAV — 좌측: body flex-row */
+body.nav-left{flex-direction:row}
+body.nav-left .top-bar{position:fixed;top:0;left:70px;right:0;z-index:200}
+body.nav-left .content-wrap{margin-top:106px}
+body.nav-left .bottom-nav{order:-1;width:70px;height:auto;flex-direction:column;border-top:none;border-right:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);align-self:stretch}
+body.nav-left .bottom-nav .nav-btn::before{top:0;bottom:0;left:0;right:auto;width:2px;height:auto;transform:scaleY(0);border-radius:0 3px 3px 0}
 body.nav-left .bottom-nav .nav-btn.active::before{transform:scaleY(1)}
-body.nav-left .bottom-nav .nav-btn{gap:3px;font-size:.5em;padding:12px 4px}
-body.nav-left .main{padding-left:calc(70px + 16px)}
+body.nav-left .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
 
 /* NAV — 우측 */
-body.nav-right .bottom-nav{bottom:0;top:106px;right:0;left:auto;width:70px;height:auto;flex-direction:column;border-top:none;border-left:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
-body.nav-right .bottom-nav .nav-btn::before{top:0;bottom:0;right:0;left:auto;width:2px;height:auto;transform:scaleY(0);transition:transform .2s;border-radius:3px 0 0 3px}
+body.nav-right{flex-direction:row}
+body.nav-right .top-bar{position:fixed;top:0;left:0;right:70px;z-index:200}
+body.nav-right .content-wrap{margin-top:106px}
+body.nav-right .bottom-nav{width:70px;height:auto;flex-direction:column;border-top:none;border-left:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom);align-self:stretch}
+body.nav-right .bottom-nav .nav-btn::before{top:0;bottom:0;right:0;left:auto;width:2px;height:auto;transform:scaleY(0);border-radius:3px 0 0 3px}
 body.nav-right .bottom-nav .nav-btn.active::before{transform:scaleY(1)}
-body.nav-right .bottom-nav .nav-btn{gap:3px;font-size:.5em;padding:12px 4px}
-body.nav-right .main{padding-right:calc(70px + 16px)}
+body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
 
 /* LAYOUT */
-.main{padding:calc(54px + 52px + 16px) 16px 100px;max-width:960px;margin:0 auto}
+.main{padding:16px 16px 20px;max-width:960px;margin:0 auto}
 .page{display:none}
 .page.active{display:block;animation:fadeUp .22s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -476,16 +520,12 @@ body.nav-right .main{padding-right:calc(70px + 16px)}
   .partial-add-btn:hover{border-color:var(--orange);color:var(--orange)}
   .btn-primary:hover{background:rgba(255,149,0,.07);box-shadow:0 0 16px rgba(255,149,0,.12),0 0 0 1px rgba(255,149,0,.15)}
 }
-/* ── SPLIT LAYOUT (가로/맥북) ── */
-@media (min-width: 1024px) {
-  .main.split-view{display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start}
-  .main.split-view .page.active{grid-column:1}
-  .main.split-view #page-calc{display:block!important;grid-column:2;grid-row:1;position:sticky;top:calc(54px + 52px + 16px)}
-  .main.split-view #page-calc .page{display:block}
-}
 </style>
 </head>
 <body>
+
+<!-- TOP BAR (고정, 줌 영향 없음) -->
+<div class="top-bar">
 
 <!-- HEADER -->
 <div class="header">
@@ -525,8 +565,17 @@ body.nav-right .main{padding-right:calc(70px + 16px)}
         <span style="font-family: var(--mono); font-size: 0.95em; font-weight: 600; color: var(--red);" id="tick-price-3">85.08</span>
         <span style="font-family: var(--mono); font-size: 0.68em; color: var(--red);" id="tick-change-3">-1.65%</span>
       </div>
-    </div><span style="font-family: var(--mono); font-size: 0.58em; color: var(--green); letter-spacing: 1px; flex-shrink: 0; padding-left: 14px; border-left: 1px solid var(--border2); margin-left: 14px; white-space: nowrap;" id="wsStatus">● LIVE</span></div>
+    </div><span style="font-family: var(--mono); font-size: 0.58em; color: var(--green); letter-spacing: 1px; flex-shrink: 0; padding-left: 14px; border-left: 1px solid var(--border2); margin-left: 14px; white-space: nowrap;" id="wsStatus">● LIVE</span>
+  <div class="data-btns" style="margin-left:auto;flex-shrink:0">
+    <button class="data-btn data-btn-backup" onclick="exportData()">↓ 백업</button>
+    <button class="data-btn data-btn-restore" onclick="importData()">↑ 복원</button>
+    <button class="data-btn data-btn-settings" onclick="openSettings()">⚙ 설정</button>
+  </div>
+</div><!-- /tickerBar -->
 
+</div><!-- /top-bar -->
+
+<div class="content-wrap">
 <div class="main">
 
 <!-- ══ NEW TRADE ══ -->
@@ -916,23 +965,43 @@ body.nav-right .main{padding-right:calc(70px + 16px)}
 
 </div>
 
-</div><!-- /main -->
-
-<!-- DATA BUTTONS -->
-<div class="data-btns">
-  <button class="data-btn data-btn-backup" onclick="exportData()">↓ 백업</button>
-  <button class="data-btn data-btn-restore" onclick="importData()">↑ 복원</button>
-  <button class="data-btn data-btn-settings" onclick="openSettings()">⚙ 설정</button>
+<!-- ══ 설정 사이드바 (와이드 화면 3번째 컬럼) ══ -->
+<div class="settings-sidebar" id="settingsSidebar">
+  <div class="card">
+    <div class="card-hd"><span class="card-title">설정</span></div>
+    <div class="settings-body" style="padding:14px">
+      <div class="settings-row">
+        <div class="settings-label">화면 모드</div>
+        <div class="settings-opts cols3">
+          <button class="sopt" id="sopt-dark2"   onclick="setTheme('dark')">🌙 다크</button>
+          <button class="sopt" id="sopt-light2"  onclick="setTheme('light')">☀️ 라이트</button>
+          <button class="sopt" id="sopt-system2" onclick="setTheme('system')">💻 시스템</button>
+        </div>
+      </div>
+      <div class="settings-row" style="margin-top:12px">
+        <div class="settings-label">메뉴 위치</div>
+        <div class="settings-opts cols4">
+          <button class="sopt" id="sopt-nav-bottom2" onclick="setNavPos('bottom')">↓ 하단</button>
+          <button class="sopt" id="sopt-nav-top2"    onclick="setNavPos('top')">↑ 상단</button>
+          <button class="sopt" id="sopt-nav-left2"   onclick="setNavPos('left')">← 좌측</button>
+          <button class="sopt" id="sopt-nav-right2"  onclick="setNavPos('right')">→ 우측</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- SETTINGS MODAL -->
+</div><!-- /main -->
+</div><!-- /content-wrap -->
+
+<!-- SETTINGS MODAL (모바일용) -->
 <div class="settings-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()">
   <div class="settings-panel">
     <div class="settings-hd">
       <span class="settings-title">⚙ 설정</span>
       <button class="settings-close" onclick="closeSettings()">✕</button>
     </div>
-    <div class="settings-body">
+    <div class="settings-body" id="settingsBodyModal">
       <div class="settings-row">
         <div class="settings-label">화면 모드</div>
         <div class="settings-opts cols3">
@@ -999,8 +1068,12 @@ function closeSettings() {
 function updateSettingsUI() {
   const theme  = localStorage.getItem('mj_theme')  || 'dark';
   const navPos = localStorage.getItem('mj_navpos') || 'bottom';
+  // 모달 버튼
   ['dark','light','system'].forEach(t => document.getElementById('sopt-'+t)?.classList.toggle('active', t===theme));
   ['bottom','top','left','right'].forEach(p => document.getElementById('sopt-nav-'+p)?.classList.toggle('active', p===navPos));
+  // 사이드바 버튼
+  ['dark','light','system'].forEach(t => document.getElementById('sopt-'+t+'2')?.classList.toggle('active', t===theme));
+  ['bottom','top','left','right'].forEach(p => document.getElementById('sopt-nav-'+p+'2')?.classList.toggle('active', p===navPos));
 }
 function setTheme(theme) {
   localStorage.setItem('mj_theme', theme);
