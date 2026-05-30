@@ -503,12 +503,27 @@ body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
 .exit-inp{background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 8px;height:38px;font-family:var(--mono);font-size:.78em;border-radius:7px;outline:none;width:100%;transition:all .2s}
 .exit-inp:focus{border-color:var(--green);box-shadow:0 0 0 1px rgba(48,209,88,.15)}
 .exit-type-sel{background:#0d0d0d;border:1px solid var(--border2);color:var(--text);height:38px;font-family:var(--mono);font-size:.7em;border-radius:7px;outline:none;width:100%;-webkit-appearance:none;padding:0 6px;transition:all .2s}
-.exit-remain{font-family:var(--mono);font-size:.62em;color:var(--text-3);margin-bottom:8px}
+.exit-remain{font-family:var(--mono);font-size:.62em;color:var(--text-3);margin:0 0 8px}
 .exit-remain span{color:var(--orange);font-weight:600}
+.exit-pct-btns{display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap}
+.exit-pct-btn{background:transparent;border:1px solid var(--border2);color:var(--text-3);height:32px;padding:0 10px;border-radius:20px;font-family:var(--mono);font-size:.65em;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.exit-pct-btn:hover,.exit-pct-btn:active{border-color:var(--green);color:var(--green)}
+.exit-pct-btn.sel{border-color:var(--green);color:var(--green);background:rgba(48,209,88,.08)}
 .exit-save-btn{width:100%;height:38px;background:transparent;border:1px solid rgba(48,209,88,.4);color:var(--green);font-family:var(--mono);font-size:.7em;letter-spacing:1px;border-radius:8px;cursor:pointer;transition:all .2s}
 .exit-save-btn:hover{background:rgba(48,209,88,.06);box-shadow:0 0 10px rgba(48,209,88,.1)}
 .exit-result-sel{display:flex;gap:6px;margin-top:8px}
 .exit-result-sel .wld-btn{flex:1;height:40px;font-size:.72em}
+
+/* ── TOGGLE SWITCH ── */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-label{font-family:var(--mono);font-size:.72em;color:var(--text-2);letter-spacing:.5px}
+.toggle-sw{position:relative;width:44px;height:26px;flex-shrink:0}
+.toggle-sw input{opacity:0;width:0;height:0;position:absolute}
+.toggle-track{position:absolute;inset:0;background:var(--border2);border-radius:13px;cursor:pointer;transition:background .2s}
+.toggle-track::before{content:'';position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.toggle-sw input:checked+.toggle-track{background:var(--green)}
+.toggle-sw input:checked+.toggle-track::before{transform:translateX(18px)}
 
 /* ── BUTTON OVERRIDES (minimal premium) ── */
 .btn{transition:all .2s}
@@ -1011,6 +1026,21 @@ body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
           <button class="sopt" id="sopt-nav-right"  onclick="setNavPos('right')">→ 우측</button>
         </div>
       </div>
+      <div class="settings-row" style="margin-top:8px">
+        <div class="settings-label">화면 확대/축소</div>
+        <div style="margin-top:8px">
+          <div class="toggle-row">
+            <span class="toggle-label">핀치 줌 허용</span>
+            <label class="toggle-sw">
+              <input type="checkbox" id="zoomToggle" onchange="setZoom(this.checked)">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          <div style="font-family:var(--mono);font-size:.58em;color:var(--text-3);margin-top:6px;line-height:1.6">
+            끄면 아이패드/맥북에서 핀치 줌 차단.<br>켜면 기본 브라우저 줌 허용.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1066,6 +1096,8 @@ function updateSettingsUI() {
   const navPos = localStorage.getItem('mj_navpos') || 'bottom';
   ['dark','light','system'].forEach(t => document.getElementById('sopt-'+t)?.classList.toggle('active', t===theme));
   ['bottom','top','left','right'].forEach(p => document.getElementById('sopt-nav-'+p)?.classList.toggle('active', p===navPos));
+  const zoomEl = document.getElementById('zoomToggle');
+  if (zoomEl) zoomEl.checked = localStorage.getItem('mj_zoom') === '1';
 }
 function setTheme(theme) {
   localStorage.setItem('mj_theme', theme);
@@ -1088,6 +1120,36 @@ function setNavPos(pos) {
 function applyNavPos(pos) {
   document.body.classList.remove('nav-top','nav-left','nav-right');
   if (pos !== 'bottom') document.body.classList.add('nav-' + pos);
+}
+
+// ── ZOOM CONTROL ──
+let _zoomHandler = null;
+let _gestureHandler = null;
+function setZoom(allow) {
+  localStorage.setItem('mj_zoom', allow ? '1' : '0');
+  applyZoom(allow);
+  const el = document.getElementById('zoomToggle');
+  if (el) el.checked = allow;
+}
+function applyZoom(allow) {
+  if (allow) {
+    if (_zoomHandler) { document.removeEventListener('touchmove', _zoomHandler); _zoomHandler = null; }
+    if (_gestureHandler) {
+      document.removeEventListener('gesturestart', _gestureHandler);
+      document.removeEventListener('gesturechange', _gestureHandler);
+      _gestureHandler = null;
+    }
+  } else {
+    if (!_zoomHandler) {
+      _zoomHandler = e => { if (e.touches && e.touches.length > 1) e.preventDefault(); };
+      document.addEventListener('touchmove', _zoomHandler, { passive: false });
+    }
+    if (!_gestureHandler) {
+      _gestureHandler = e => e.preventDefault();
+      document.addEventListener('gesturestart', _gestureHandler, { passive: false });
+      document.addEventListener('gesturechange', _gestureHandler, { passive: false });
+    }
+  }
 }
 
 // ── SPLIT VIEW ──
@@ -1677,6 +1739,9 @@ function renderHistory() {
         ${exitRecordsHtml ? `<div class="exit-records">${exitRecordsHtml}</div>` : ''}
         <div class="exit-remain">남은 수량: <span>${remainAmt.toFixed(4)}</span> (${100-parseInt(exitedPct)}%)</div>
         <div class="exit-add-form">
+          <div class="exit-pct-btns">
+            ${[10,25,50,75,100].map(p=>`<button class="exit-pct-btn" onclick="setExitPct('${t.id}',${p})">${p}%</button>`).join('')}
+          </div>
           <div class="exit-form-grid">
             <input class="exit-inp" type="number" placeholder="청산가" inputmode="decimal" id="ex-price-${t.id}">
             <input class="exit-inp" type="number" placeholder="수량" inputmode="decimal" id="ex-amt-${t.id}" oninput="syncEFAmt('${t.id}',false)">
@@ -1809,6 +1874,22 @@ function syncEFAmt(id, pctChanged) {
   }
 }
 
+// 퍼센트 퀵셀렉트
+function setExitPct(id, pct) {
+  const t = trades.find(x=>x.id===id); if (!t) return;
+  const exitedAmt = (t.partialExits||[]).filter(e=>e.amount>0).reduce((s,e)=>s+(e.amount||0),0);
+  const remain = Math.max(0,(t.amount||0)-exitedAmt);
+  const amt = remain * pct / 100;
+  const pctEl = document.getElementById('ex-pct-'+id);
+  const amtEl = document.getElementById('ex-amt-'+id);
+  if (pctEl) pctEl.value = pct;
+  if (amtEl) amtEl.value = amt.toFixed(4);
+  // 선택 버튼 하이라이트
+  document.querySelectorAll(`#exitsec-${id} .exit-pct-btn`).forEach(b => {
+    b.classList.toggle('sel', b.textContent === pct+'%');
+  });
+}
+
 // 청산 저장
 function saveExitToTrade(id) {
   const t = trades.find(x => x.id === id); if (!t) return;
@@ -1831,7 +1912,13 @@ function saveExitToTrade(id) {
   t.pnl   = (t.ls==='SHORT' ? (t.entry-avgExit) : (avgExit-t.entry)) * totalExitAmt;
   t.roi   = (t.ls==='SHORT' ? (t.entry-avgExit) : (avgExit-t.entry)) / t.entry * 100;
   t.dur   = (t.xDate&&t.eDate) ? (new Date(t.xDate)-new Date(t.eDate))/3600000 : null;
-  save(); renderHistory();
+  save();
+  renderHistory();
+  // 저장 후 해당 섹션 자동 재오픈
+  setTimeout(() => {
+    const sec = document.getElementById('exitsec-'+id);
+    if (sec) sec.classList.add('open');
+  }, 50);
 }
 
 // 청산 기록 삭제
@@ -1847,7 +1934,12 @@ function removeExitFromTrade(id, idx) {
     t.pnl  = (t.ls==='SHORT'?(t.entry-avg):(avg-t.entry))*totalAmt;
     t.roi  = (t.ls==='SHORT'?(t.entry-avg):(avg-t.entry))/t.entry*100;
   }
-  save(); renderHistory();
+  save();
+  renderHistory();
+  setTimeout(() => {
+    const sec = document.getElementById('exitsec-'+id);
+    if (sec) sec.classList.add('open');
+  }, 50);
 }
 
 // 거래 종료 처리
@@ -2706,6 +2798,7 @@ function resetCalc() {
 // ── INIT ──
 applyTheme(localStorage.getItem('mj_theme') || 'dark');
 applyNavPos(localStorage.getItem('mj_navpos') || 'bottom');
+applyZoom(localStorage.getItem('mj_zoom') === '1');
 renderCoins();
 renderCalcCoins();
 renderTickerBar();
