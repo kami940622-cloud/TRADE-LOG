@@ -25,8 +25,60 @@
 html{height:100%}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;padding-bottom:90px;overscroll-behavior:none}
 
+/* ── LIGHT THEME ── */
+body.light-theme{
+  --bg:#f8f8f5;--surface:#fff;--panel:#f0f0ec;--panel2:#e8e8e4;
+  --border:#d8d8d4;--border2:#c8c8c4;
+  --text:#1a1a18;--text-2:#555552;--text-3:#989894;
+  --orange:#c87000;--orange2:#e08000;--orange-d:rgba(200,112,0,.12);
+  --green:#1a7a3a;--green-d:rgba(26,122,58,.1);
+  --red:#cc2222;--red-d:rgba(204,34,34,.1);
+  --blue:#0060cc;--blue-d:rgba(0,96,204,.1);
+  --gray-d:rgba(100,100,100,.1);
+}
+body.light-theme .fg input,
+body.light-theme .fg select,
+body.light-theme .fg textarea,
+body.light-theme .partial-input,
+body.light-theme .partial-pct,
+body.light-theme .partial-type,
+body.light-theme .buy-input,
+body.light-theme .ls-btn,
+body.light-theme .review-area{background:#fff}
+body.light-theme .header{background:var(--orange)}
+body.light-theme .hstat-value{color:#000}
+body.light-theme .hstat-label{color:rgba(0,0,0,.5)}
+
+/* ── SETTINGS MODAL ── */
+.settings-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.settings-ov.open{display:flex}
+.settings-panel{background:var(--panel);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:340px;overflow:hidden}
+.settings-hd{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.settings-title{font-family:var(--mono);font-size:.72em;letter-spacing:2px;text-transform:uppercase;color:var(--orange)}
+.settings-close{background:transparent;border:1px solid var(--border2);color:var(--text-3);width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:.8em;transition:all .2s}
+.settings-close:hover{border-color:var(--text-2);color:var(--text-2)}
+.settings-body{padding:16px 18px;display:flex;flex-direction:column;gap:16px}
+.settings-row{display:flex;flex-direction:column;gap:8px}
+.settings-label{font-family:var(--mono);font-size:.58em;letter-spacing:2px;text-transform:uppercase;color:var(--text-3)}
+.settings-opts{display:grid;gap:6px}
+.settings-opts.cols3{grid-template-columns:repeat(3,1fr)}
+.settings-opts.cols4{grid-template-columns:repeat(4,1fr)}
+.sopt{background:transparent;border:1px solid var(--border2);color:var(--text-3);height:38px;border-radius:8px;font-family:var(--mono);font-size:.65em;letter-spacing:.5px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.sopt:hover{border-color:rgba(255,149,0,.4);color:rgba(255,149,0,.7)}
+.sopt.active{border-color:var(--orange);color:var(--orange);box-shadow:0 0 10px rgba(255,149,0,.1)}
+
+/* ── DATA BUTTONS ── */
+.data-btns{position:fixed;top:58px;right:10px;z-index:99;display:flex;gap:5px}
+.data-btn{height:28px;padding:0 10px;border-radius:6px;font-family:var(--mono);font-size:.58em;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.data-btn-backup{background:transparent;border:1px solid rgba(10,132,255,.3);color:var(--blue)}
+.data-btn-backup:hover{border-color:var(--blue);box-shadow:0 0 8px rgba(10,132,255,.1)}
+.data-btn-restore{background:transparent;border:1px solid rgba(48,209,88,.3);color:var(--green)}
+.data-btn-restore:hover{border-color:var(--green);box-shadow:0 0 8px rgba(48,209,88,.1)}
+.data-btn-settings{background:transparent;border:1px solid rgba(255,149,0,.3);color:var(--orange)}
+.data-btn-settings:hover{border-color:var(--orange);box-shadow:0 0 8px rgba(255,149,0,.1)}
+
 /* HEADER */
-.header{background:var(--orange);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.header{background:var(--orange);padding:0 20px;height:54px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:200}
 .header-logo{font-family:var(--mono);font-weight:700;font-size:1.05em;color:#000;letter-spacing:2px;display:flex;align-items:center;gap:10px}
 .logo-sq{width:20px;height:20px;background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo-sq::after{content:'';width:9px;height:9px;background:var(--orange);display:block}
@@ -38,19 +90,38 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .hstat-value.neg{color:#7a0000}
 
 /* TICKER */
-#tickerBar{background:#000;border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#tickerBar{background:#000;border-bottom:1px solid var(--border);padding:0 16px;height:52px;display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;position:fixed;top:54px;left:0;right:0;z-index:199}
 #tickerBar::-webkit-scrollbar{display:none}
 
-/* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:82px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+/* BOTTOM NAV — 하단(기본) */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:82px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:150;padding-bottom:env(safe-area-inset-bottom);transition:all .25s}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:none;border:none;color:var(--text-3);cursor:pointer;font-family:var(--mono);font-size:.58em;letter-spacing:1px;text-transform:uppercase;transition:color .15s;padding:8px 0;position:relative}
 .nav-btn::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--orange);transform:scaleX(0);transition:transform .2s;border-radius:0 0 3px 3px}
 .nav-btn.active{color:var(--orange)}
 .nav-btn.active::before{transform:scaleX(1)}
 .nav-icon{font-size:1.6em;line-height:1}
 
+/* NAV — 상단 */
+body.nav-top .bottom-nav{bottom:auto;top:106px;border-top:none;border-bottom:1px solid var(--border);padding-bottom:0}
+body.nav-top .bottom-nav .nav-btn::before{top:auto;bottom:0;border-radius:3px 3px 0 0}
+body.nav-top .main{padding-top:calc(106px + 82px + 8px);padding-bottom:16px}
+
+/* NAV — 좌측 */
+body.nav-left .bottom-nav{bottom:0;top:106px;left:0;right:auto;width:70px;height:auto;flex-direction:column;border-top:none;border-right:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
+body.nav-left .bottom-nav .nav-btn::before{top:0;bottom:0;left:0;right:auto;width:2px;height:auto;transform:scaleY(0);transition:transform .2s;border-radius:0 3px 3px 0}
+body.nav-left .bottom-nav .nav-btn.active::before{transform:scaleY(1)}
+body.nav-left .bottom-nav .nav-btn{gap:3px;font-size:.5em;padding:12px 4px}
+body.nav-left .main{padding-left:calc(70px + 16px)}
+
+/* NAV — 우측 */
+body.nav-right .bottom-nav{bottom:0;top:106px;right:0;left:auto;width:70px;height:auto;flex-direction:column;border-top:none;border-left:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
+body.nav-right .bottom-nav .nav-btn::before{top:0;bottom:0;right:0;left:auto;width:2px;height:auto;transform:scaleY(0);transition:transform .2s;border-radius:3px 0 0 3px}
+body.nav-right .bottom-nav .nav-btn.active::before{transform:scaleY(1)}
+body.nav-right .bottom-nav .nav-btn{gap:3px;font-size:.5em;padding:12px 4px}
+body.nav-right .main{padding-right:calc(70px + 16px)}
+
 /* LAYOUT */
-.main{padding:16px;max-width:900px;margin:0 auto}
+.main{padding:calc(54px + 52px + 16px) 16px 100px;max-width:960px;margin:0 auto}
 .page{display:none}
 .page.active{display:block;animation:fadeUp .22s ease}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -390,23 +461,27 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 /* ── RESPONSIVE ── */
 @media (min-width: 768px) {
-  .main{padding:20px 24px}
+  .main{padding-left:24px;padding-right:24px}
   .form-body{gap:14px}
   .partial-hd,.partial-row{grid-template-columns:64px 1fr 1fr 64px 32px}
   .partial-row.exit-row,.partial-hd.exit-hd{grid-template-columns:64px 1fr 1fr 64px 60px 32px}
 }
-@media (min-width: 1100px) {
-  .main{max-width:1100px}
-  #page-new .card{max-width:740px;margin:0 auto}
+@media (min-width: 1024px) {
+  .main{max-width:1400px;padding-left:28px;padding-right:28px}
   .info-grid{grid-template-columns:repeat(6,1fr)}
-  .partial-hd,.partial-row{grid-template-columns:64px 1fr 1fr 64px 32px}
-  .partial-row.exit-row,.partial-hd.exit-hd{grid-template-columns:64px 1fr 1fr 64px 60px 32px}
-  .nav-btn{font-size:.65em}
+  .nav-btn{font-size:.62em}
   .tag-btn:hover{border-color:rgba(255,149,0,.45);color:rgba(255,149,0,.7)}
   .seg-btn:hover{border-color:rgba(255,149,0,.4);color:rgba(255,149,0,.7)}
   .rule-item:hover{border-color:rgba(255,255,255,.12)}
   .partial-add-btn:hover{border-color:var(--orange);color:var(--orange)}
   .btn-primary:hover{background:rgba(255,149,0,.07);box-shadow:0 0 16px rgba(255,149,0,.12),0 0 0 1px rgba(255,149,0,.15)}
+}
+/* ── SPLIT LAYOUT (가로/맥북) ── */
+@media (min-width: 1024px) {
+  .main.split-view{display:grid;grid-template-columns:1fr 400px;gap:20px;align-items:start}
+  .main.split-view .page.active{grid-column:1}
+  .main.split-view #page-calc{display:block!important;grid-column:2;grid-row:1;position:sticky;top:calc(54px + 52px + 16px)}
+  .main.split-view #page-calc .page{display:block}
 }
 </style>
 </head>
@@ -844,9 +919,39 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 </div><!-- /main -->
 
 <!-- DATA BUTTONS -->
-<div style="position:fixed;top:54px;right:12px;z-index:99;display:flex;gap:6px">
-  <button onclick="exportData()" style="height:32px;padding:0 12px;background:var(--panel);border:1px solid var(--border2);color:var(--text-2);font-family:var(--mono);font-size:.62em;letter-spacing:1px;border-radius:7px;cursor:pointer">↓ 백업</button>
-  <button onclick="importData()" style="height:32px;padding:0 12px;background:var(--panel);border:1px solid var(--border2);color:var(--text-2);font-family:var(--mono);font-size:.62em;letter-spacing:1px;border-radius:7px;cursor:pointer">↑ 복원</button>
+<div class="data-btns">
+  <button class="data-btn data-btn-backup" onclick="exportData()">↓ 백업</button>
+  <button class="data-btn data-btn-restore" onclick="importData()">↑ 복원</button>
+  <button class="data-btn data-btn-settings" onclick="openSettings()">⚙ 설정</button>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="settings-ov" id="settingsOv" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-panel">
+    <div class="settings-hd">
+      <span class="settings-title">⚙ 설정</span>
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="settings-body">
+      <div class="settings-row">
+        <div class="settings-label">화면 모드</div>
+        <div class="settings-opts cols3">
+          <button class="sopt" id="sopt-dark"   onclick="setTheme('dark')">🌙 다크</button>
+          <button class="sopt" id="sopt-light"  onclick="setTheme('light')">☀️ 라이트</button>
+          <button class="sopt" id="sopt-system" onclick="setTheme('system')">💻 시스템</button>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="settings-label">메뉴 위치</div>
+        <div class="settings-opts cols4">
+          <button class="sopt" id="sopt-nav-bottom" onclick="setNavPos('bottom')">↓ 하단</button>
+          <button class="sopt" id="sopt-nav-top"    onclick="setNavPos('top')">↑ 상단</button>
+          <button class="sopt" id="sopt-nav-left"   onclick="setNavPos('left')">← 좌측</button>
+          <button class="sopt" id="sopt-nav-right"  onclick="setNavPos('right')">→ 우측</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
@@ -883,6 +988,54 @@ let selectedEntryType  = null;  // '계획'|'TF타협'|'즉흥'
 let selectedTags       = [];    // string[]
 let checkedRules       = [];    // number[] (0~5)
 
+// ── SETTINGS ──
+function openSettings() {
+  document.getElementById('settingsOv').classList.add('open');
+  updateSettingsUI();
+}
+function closeSettings() {
+  document.getElementById('settingsOv').classList.remove('open');
+}
+function updateSettingsUI() {
+  const theme  = localStorage.getItem('mj_theme')  || 'dark';
+  const navPos = localStorage.getItem('mj_navpos') || 'bottom';
+  ['dark','light','system'].forEach(t => document.getElementById('sopt-'+t)?.classList.toggle('active', t===theme));
+  ['bottom','top','left','right'].forEach(p => document.getElementById('sopt-nav-'+p)?.classList.toggle('active', p===navPos));
+}
+function setTheme(theme) {
+  localStorage.setItem('mj_theme', theme);
+  applyTheme(theme);
+  updateSettingsUI();
+}
+function applyTheme(theme) {
+  const body = document.body;
+  body.classList.remove('light-theme');
+  if (theme === 'light') body.classList.add('light-theme');
+  else if (theme === 'system') {
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) body.classList.add('light-theme');
+  }
+}
+function setNavPos(pos) {
+  localStorage.setItem('mj_navpos', pos);
+  applyNavPos(pos);
+  updateSettingsUI();
+}
+function applyNavPos(pos) {
+  document.body.classList.remove('nav-top','nav-left','nav-right');
+  if (pos !== 'bottom') document.body.classList.add('nav-' + pos);
+}
+
+// ── SPLIT VIEW ──
+function updateSplitView(pageId) {
+  const main = document.querySelector('.main');
+  if (!main) return;
+  if (pageId === 'new' && window.innerWidth >= 1024) {
+    main.classList.add('split-view');
+  } else {
+    main.classList.remove('split-view');
+  }
+}
+
 // ── PERSIST ──
 function save() { localStorage.setItem('mj_trades', JSON.stringify(trades)); updateHeader(); }
 function saveCoins() { localStorage.setItem('mj_coins', JSON.stringify(coins)); }
@@ -905,6 +1058,7 @@ function goPage(id, btn) {
   if (id === 'history') renderHistory();
   if (id === 'dash')    renderDash();
   if (id === 'weekly')  renderWeekly();
+  updateSplitView(id);
 }
 
 // ── LONG/SHORT ──
@@ -2339,6 +2493,8 @@ function resetCalc() {
 }
 
 // ── INIT ──
+applyTheme(localStorage.getItem('mj_theme') || 'dark');
+applyNavPos(localStorage.getItem('mj_navpos') || 'bottom');
 renderCoins();
 renderCalcCoins();
 renderTickerBar();
@@ -2346,6 +2502,11 @@ updateHeader();
 connectWS();
 addBuyRow();       // CALC 초기 매수 행 1개
 addPartialEntry(); // NEW 탭 진입 기본 1행 (날짜 자동설정 포함)
+updateSplitView('new'); // 가로화면이면 초기에도 스플릿 적용
+// 시스템 테마 변경 감지
+window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+  if (localStorage.getItem('mj_theme') === 'system') applyTheme('system');
+});
 </script>
 
 
