@@ -1597,8 +1597,9 @@ function renderHistory() {
   empty.style.display = 'none';
 
   container.innerHTML = list.map(t => {
-    const pnl    = t.pnl;
-    const roi    = t.roi;
+    try {
+    const pnl    = t.pnl != null ? Number(t.pnl) : null;
+    const roi    = t.roi != null ? Number(t.roi) : null;
     const pnlTxt = pnl !== null ? `${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}` : '—';
     const roiTxt = roi !== null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%` : '—';
     const pnlCls = pnl !== null ? (pnl >= 0 ? 'green' : 'red') : '';
@@ -1771,6 +1772,13 @@ function renderHistory() {
         </div>
       </div>
     </div>`;
+    } catch(err) {
+      console.error('renderHistory 에러 (id:'+t.id+')', err);
+      return `<div class="trade-card" style="padding:12px 14px">
+        <div style="font-family:var(--mono);font-size:.7em;color:var(--red)">⚠ 거래 데이터 오류: ${t.coin||'?'}</div>
+        <button onclick="delTrade('${t.id||''}')" style="margin-top:6px;background:transparent;border:1px solid var(--red);color:var(--red);padding:4px 10px;border-radius:6px;font-family:var(--mono);font-size:.65em;cursor:pointer">삭제</button>
+      </div>`;
+    }
   }).join('');
 }
 
