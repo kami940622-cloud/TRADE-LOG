@@ -290,99 +290,123 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .buy-del:active{border-color:var(--red);color:var(--red)}
 
 /* ── PARTIAL ENTRIES / EXITS ── */
-.partial-hd{display:grid;grid-template-columns:80px 1fr 1fr 80px 36px;gap:6px;padding:0 2px;margin-bottom:4px}
-.partial-hd-label{font-family:var(--mono);font-size:.55em;color:var(--text-3);letter-spacing:1px}
-.partial-row{display:grid;grid-template-columns:80px 1fr 1fr 80px 36px;gap:6px;margin-bottom:6px;align-items:center}
-.partial-row.exit-row{grid-template-columns:80px 1fr 1fr 80px 60px 36px}
-.partial-hd.exit-hd{grid-template-columns:80px 1fr 1fr 80px 60px 36px}
-.partial-input{background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 10px;height:44px;font-family:var(--mono);font-size:.82em;border-radius:7px;outline:none;width:100%;transition:border-color .15s}
-.partial-input:focus{border-color:var(--orange)}
-.partial-pct{background:#0d0d0d;border:1px solid rgba(255,149,0,.25);color:var(--orange);padding:0 8px;height:44px;font-family:var(--mono);font-size:.78em;border-radius:7px;outline:none;width:100%;transition:border-color .15s;text-align:center}
-.partial-pct:focus{border-color:var(--orange)}
-.partial-del{background:none;border:1px solid var(--border2);color:var(--text-3);height:36px;width:36px;border-radius:7px;cursor:pointer;font-size:.9em;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.partial-hd{display:grid;grid-template-columns:56px 1fr 1fr 56px 32px;gap:5px;padding:0 2px;margin-bottom:4px}
+.partial-hd-label{font-family:var(--mono);font-size:.52em;color:var(--text-3);letter-spacing:1px}
+.partial-row{display:grid;grid-template-columns:56px 1fr 1fr 56px 32px;gap:5px;margin-bottom:5px;align-items:center}
+.partial-row.exit-row{grid-template-columns:56px 1fr 1fr 56px 54px 32px}
+.partial-hd.exit-hd{grid-template-columns:56px 1fr 1fr 56px 54px 32px}
+.partial-date-row{display:flex;gap:6px;align-items:center;margin-bottom:5px;padding-left:61px}
+.partial-input{background:transparent;border:1px solid var(--border2);color:var(--text);padding:0 10px;height:42px;font-family:var(--mono);font-size:.8em;border-radius:8px;outline:none;width:100%;transition:all .2s}
+.partial-input:focus{border-color:var(--orange);box-shadow:0 0 0 1px rgba(255,149,0,.15)}
+.partial-pct{background:transparent;border:1px solid rgba(255,149,0,.2);color:var(--orange);padding:0 6px;height:42px;font-family:var(--mono);font-size:.75em;border-radius:8px;outline:none;width:100%;transition:all .2s;text-align:center}
+.partial-pct:focus{border-color:var(--orange);box-shadow:0 0 0 1px rgba(255,149,0,.15)}
+.partial-del{background:transparent;border:1px solid var(--border2);color:var(--text-3);height:32px;width:32px;border-radius:7px;cursor:pointer;font-size:.8em;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
 .partial-del:hover,.partial-del:active{border-color:var(--red);color:var(--red)}
-.partial-type{background:#0d0d0d;border:1px solid var(--border2);color:var(--text);padding:0 6px;height:44px;font-family:var(--mono);font-size:.72em;border-radius:7px;outline:none;width:100%;-webkit-appearance:none}
-.partial-add-btn{width:100%;height:38px;background:var(--orange-d);border:1px dashed rgba(255,149,0,.35);color:var(--orange);font-family:var(--mono);font-size:.68em;letter-spacing:1px;border-radius:8px;cursor:pointer;margin-top:2px}
-.partial-summary{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.partial-type{background:transparent;border:1px solid var(--border2);color:var(--text-2);padding:0 6px;height:42px;font-family:var(--mono);font-size:.68em;border-radius:8px;outline:none;width:100%;-webkit-appearance:none;transition:all .2s}
+.partial-add-btn{width:100%;height:36px;background:transparent;border:1px dashed rgba(255,149,0,.25);color:rgba(255,149,0,.6);font-family:var(--mono);font-size:.65em;letter-spacing:1.5px;border-radius:8px;cursor:pointer;margin-top:4px;transition:all .2s}
+.partial-add-btn:hover{border-color:var(--orange);color:var(--orange);box-shadow:0 0 10px rgba(255,149,0,.08)}
+.partial-summary{border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:8px;background:rgba(255,149,0,.03)}
 .partial-sum-item{text-align:center}
-.partial-sum-label{font-family:var(--mono);font-size:.52em;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:3px}
-.partial-sum-val{font-family:var(--mono);font-size:.88em;font-weight:700;color:var(--orange)}
+.partial-sum-label{font-family:var(--mono);font-size:.5em;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:3px}
+.partial-sum-val{font-family:var(--mono);font-size:.85em;font-weight:600;color:var(--orange)}
 .partial-sum-val.green{color:var(--green)}
 .partial-sum-val.red{color:var(--red)}
 .partial-sum-val.gray{color:var(--text-2)}
-.partial-row-label{font-family:var(--mono);font-size:.6em;color:var(--text-3);letter-spacing:1px;padding:2px 0;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(255,149,0,.05);border:1px solid rgba(255,149,0,.15);border-radius:7px}
+.partial-row-label{font-family:var(--mono);font-size:.58em;color:rgba(255,149,0,.5);letter-spacing:1px;height:42px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,149,0,.12);border-radius:8px;background:rgba(255,149,0,.03)}
 
 /* ── TAGS ── */
 .tags-wrap{display:flex;flex-wrap:wrap;gap:6px}
-.tag-btn{background:#0d0d0d;border:1px solid var(--border2);color:var(--text-3);padding:6px 12px;border-radius:20px;font-family:var(--mono);font-size:.65em;letter-spacing:1px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.tag-btn:hover{border-color:var(--orange);color:var(--orange)}
-.tag-btn.active{background:var(--orange-d);border-color:var(--orange);color:var(--orange);font-weight:700}
-
-/* ── RULE CHECKLIST ── */
-.rule-list{display:flex;flex-direction:column;gap:8px}
-.rule-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#0d0d0d;border:1px solid var(--border2);border-radius:8px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.rule-item.checked{background:rgba(48,209,88,.06);border-color:rgba(48,209,88,.3)}
-.rule-cb{width:20px;height:20px;border:2px solid var(--border2);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-size:.75em}
-.rule-item.checked .rule-cb{background:var(--green);border-color:var(--green);color:#000}
-.rule-text{font-family:var(--mono);font-size:.72em;color:var(--text-3);letter-spacing:.5px}
-.rule-item.checked .rule-text{color:var(--text)}
+.tag-btn{background:transparent;border:1px solid var(--border2);color:var(--text-3);padding:6px 13px;border-radius:20px;font-family:var(--mono);font-size:.62em;letter-spacing:.5px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.tag-btn:hover{border-color:rgba(255,149,0,.45);color:rgba(255,149,0,.7)}
+.tag-btn.active{border-color:var(--orange);color:var(--orange);box-shadow:0 0 8px rgba(255,149,0,.12),inset 0 0 0 1px rgba(255,149,0,.08)}
 
 /* ── EMOTION / ENTRY TYPE ── */
 .seg-wrap{display:grid;gap:6px}
 .seg-wrap.cols3{grid-template-columns:repeat(3,1fr)}
 .seg-wrap.cols3b{grid-template-columns:repeat(3,1fr)}
-.seg-btn{background:#0d0d0d;border:1px solid var(--border2);color:var(--text-3);height:44px;border-radius:8px;font-family:var(--mono);font-size:.72em;letter-spacing:1px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.seg-btn:hover{border-color:var(--orange);color:var(--orange)}
-.seg-btn.active{background:var(--orange-d);border-color:var(--orange);color:var(--orange);font-weight:700}
-.seg-btn.e-cold.active{background:rgba(10,132,255,.12);border-color:var(--blue);color:var(--blue)}
-.seg-btn.e-hot.active{background:rgba(255,69,58,.12);border-color:var(--red);color:var(--red)}
-.seg-btn.e-anxious.active{background:rgba(255,149,0,.12);border-color:var(--orange);color:var(--orange)}
+.seg-btn{background:transparent;border:1px solid var(--border2);color:var(--text-3);height:42px;border-radius:8px;font-family:var(--mono);font-size:.7em;letter-spacing:.5px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent}
+.seg-btn:hover{border-color:rgba(255,149,0,.4);color:rgba(255,149,0,.7)}
+.seg-btn.active{border-color:var(--orange);color:var(--orange);box-shadow:0 0 12px rgba(255,149,0,.1),inset 0 0 0 1px rgba(255,149,0,.06)}
+.seg-btn.e-cold.active{border-color:var(--blue);color:var(--blue);box-shadow:0 0 12px rgba(10,132,255,.1),inset 0 0 0 1px rgba(10,132,255,.06)}
+.seg-btn.e-hot.active{border-color:var(--red);color:var(--red);box-shadow:0 0 12px rgba(255,69,58,.1),inset 0 0 0 1px rgba(255,69,58,.06)}
+.seg-btn.e-anxious.active{border-color:var(--orange);color:var(--orange);box-shadow:0 0 12px rgba(255,149,0,.1),inset 0 0 0 1px rgba(255,149,0,.06)}
 
-/* ── HISTORY DETAIL EXPAND ── */
-.tc-detail{border-top:1px solid var(--border);background:rgba(0,0,0,.15);padding:12px 14px;display:none}
+/* ── RULE CHECKLIST ACCORDION ── */
+.rule-accordion{border:1px solid var(--border2);border-radius:10px;overflow:hidden}
+.rule-trigger{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;background:transparent}
+.rule-trigger:hover{background:rgba(255,149,0,.04)}
+.rule-trigger-left{display:flex;align-items:center;gap:10px}
+.rule-trigger-icon{font-size:.9em;opacity:.7}
+.rule-trigger-text{font-family:var(--mono);font-size:.68em;letter-spacing:1px;color:var(--text-3)}
+.rule-trigger-badge{font-family:var(--mono);font-size:.6em;padding:2px 9px;border-radius:10px;border:1px solid var(--border2);color:var(--text-3)}
+.rule-trigger-badge.done{border-color:rgba(48,209,88,.4);color:var(--green);box-shadow:0 0 8px rgba(48,209,88,.1)}
+.rule-arrow{font-size:.7em;color:var(--text-3);transition:transform .25s;flex-shrink:0}
+.rule-arrow.open{transform:rotate(180deg)}
+.rule-panel{border-top:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.rule-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border2);border-radius:8px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;background:transparent}
+.rule-item:hover{border-color:rgba(255,255,255,.12)}
+.rule-item.checked{border-color:rgba(48,209,88,.25);background:rgba(48,209,88,.04)}
+.rule-cb{width:18px;height:18px;border:1px solid var(--border2);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:.7em}
+.rule-item.checked .rule-cb{background:var(--green);border-color:var(--green);color:#000;box-shadow:0 0 6px rgba(48,209,88,.3)}
+.rule-text{font-family:var(--mono);font-size:.68em;color:var(--text-3);letter-spacing:.3px}
+.rule-item.checked .rule-text{color:var(--text-2)}
+
+/* ── HISTORY DETAIL ── */
+.tc-detail{border-top:1px solid var(--border);background:rgba(0,0,0,.12);padding:12px 14px;display:none}
 .tc-detail.open{display:block}
-.detail-toggle{background:none;border:1px solid var(--border2);color:var(--text-3);padding:3px 10px;font-family:var(--mono);font-size:.6em;border-radius:6px;cursor:pointer;letter-spacing:1px;transition:all .12s;flex-shrink:0}
-.detail-toggle:hover,.detail-toggle:active{border-color:var(--blue);color:var(--blue)}
+.detail-toggle{background:transparent;border:1px solid var(--border2);color:var(--text-3);padding:3px 10px;font-family:var(--mono);font-size:.58em;border-radius:6px;cursor:pointer;letter-spacing:1px;transition:all .2s;flex-shrink:0}
+.detail-toggle:hover,.detail-toggle:active{border-color:rgba(10,132,255,.5);color:var(--blue)}
 .partial-table{width:100%;border-collapse:collapse;margin-bottom:6px}
-.partial-table th{font-family:var(--mono);font-size:.55em;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);padding:4px 8px;text-align:left;border-bottom:1px solid var(--border)}
-.partial-table td{font-family:var(--mono);font-size:.72em;color:var(--text-2);padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.03)}
+.partial-table th{font-family:var(--mono);font-size:.52em;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);padding:4px 8px;text-align:left;border-bottom:1px solid var(--border)}
+.partial-table td{font-family:var(--mono);font-size:.7em;color:var(--text-2);padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.02)}
 .partial-table tr:last-child td{border-bottom:none}
 .badge-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-.badge{font-family:var(--mono);font-size:.6em;padding:3px 8px;border-radius:12px;letter-spacing:.5px}
-.badge.tag{background:rgba(255,149,0,.1);color:var(--orange);border:1px solid rgba(255,149,0,.25)}
-.badge.emotion-cold{background:rgba(10,132,255,.1);color:var(--blue);border:1px solid rgba(10,132,255,.25)}
-.badge.emotion-hot{background:rgba(255,69,58,.1);color:var(--red);border:1px solid rgba(255,69,58,.25)}
-.badge.emotion-anxious{background:rgba(255,149,0,.1);color:var(--orange);border:1px solid rgba(255,149,0,.25)}
-.badge.etype{background:rgba(150,150,150,.1);color:var(--text-2);border:1px solid var(--border2)}
-.badge.session{background:rgba(10,132,255,.08);color:var(--blue);border:1px solid rgba(10,132,255,.2)}
-.badge.rule-ok{background:rgba(48,209,88,.08);color:var(--green);border:1px solid rgba(48,209,88,.2)}
-.badge.rule-warn{background:rgba(255,69,58,.08);color:var(--red);border:1px solid rgba(255,69,58,.2)}
+.badge{font-family:var(--mono);font-size:.58em;padding:3px 8px;border-radius:12px;letter-spacing:.3px}
+.badge.tag{border:1px solid rgba(255,149,0,.2);color:rgba(255,149,0,.8)}
+.badge.emotion-cold{border:1px solid rgba(10,132,255,.2);color:var(--blue)}
+.badge.emotion-hot{border:1px solid rgba(255,69,58,.2);color:var(--red)}
+.badge.emotion-anxious{border:1px solid rgba(255,149,0,.2);color:var(--orange)}
+.badge.etype{border:1px solid var(--border2);color:var(--text-3)}
+.badge.session{border:1px solid rgba(10,132,255,.2);color:rgba(10,132,255,.8)}
+.badge.rule-ok{border:1px solid rgba(48,209,88,.2);color:var(--green)}
+.badge.rule-warn{border:1px solid rgba(255,69,58,.15);color:rgba(255,69,58,.8)}
+
+/* ── BUTTON OVERRIDES (minimal premium) ── */
+.btn{transition:all .2s}
+.btn-primary{background:transparent;border:1px solid var(--orange);color:var(--orange)}
+.btn-primary:hover,.btn-primary:active{background:rgba(255,149,0,.07);box-shadow:0 0 16px rgba(255,149,0,.12),0 0 0 1px rgba(255,149,0,.15)}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text-3)}
+.btn-ghost:hover,.btn-ghost:active{border-color:var(--text-2);color:var(--text-2)}
+.now-btn{background:transparent;border:1px solid rgba(255,149,0,.25);color:rgba(255,149,0,.7)}
+.now-btn:hover{border-color:var(--orange);color:var(--orange)}
+.now-btn-sm{background:transparent;border:1px solid rgba(255,149,0,.25);color:rgba(255,149,0,.7)}
+.now-btn-sm:hover{border-color:var(--orange);color:var(--orange)}
+.tc-edit-btn{transition:all .2s}
+.tc-edit-btn:hover,.tc-edit-btn:active{border-color:var(--orange);color:var(--orange);box-shadow:0 0 8px rgba(255,149,0,.1)}
+.tc-edit-btn.del:hover,.tc-edit-btn.del:active{border-color:var(--red);color:var(--red);box-shadow:0 0 8px rgba(255,69,58,.1)}
+.wld-btn{transition:all .2s}
+.filter-tab{transition:all .2s}
+.filter-tab.active{background:transparent;border:1px solid var(--orange);color:var(--orange);font-weight:600}
 
 /* ── RESPONSIVE ── */
 @media (min-width: 768px) {
-  body{font-size:15px}
   .main{padding:20px 24px}
   .form-body{gap:14px}
-  .form-row{grid-template-columns:1fr 1fr}
-  .partial-hd,.partial-row{grid-template-columns:90px 1fr 1fr 90px 36px}
-  .partial-row.exit-row,.partial-hd.exit-hd{grid-template-columns:90px 1fr 1fr 90px 70px 36px}
-  .fg input,.fg select,.fg textarea{height:48px}
-  .ls-toggle{height:48px}
-  .btn{height:48px}
+  .partial-hd,.partial-row{grid-template-columns:64px 1fr 1fr 64px 32px}
+  .partial-row.exit-row,.partial-hd.exit-hd{grid-template-columns:64px 1fr 1fr 64px 60px 32px}
 }
 @media (min-width: 1100px) {
-  body{font-size:15px}
   .main{max-width:1100px}
-  #page-new .card{max-width:720px;margin:0 auto}
+  #page-new .card{max-width:740px;margin:0 auto}
   .info-grid{grid-template-columns:repeat(6,1fr)}
-  .fg input,.fg select{height:44px}
-  .btn{height:44px}
+  .partial-hd,.partial-row{grid-template-columns:64px 1fr 1fr 64px 32px}
+  .partial-row.exit-row,.partial-hd.exit-hd{grid-template-columns:64px 1fr 1fr 64px 60px 32px}
   .nav-btn{font-size:.65em}
-  .tag-btn:hover{border-color:var(--orange);color:var(--orange)}
-  .rule-item:hover{border-color:rgba(48,209,88,.3);background:rgba(48,209,88,.03)}
-  .tc-edit-btn:hover{border-color:var(--orange);color:var(--orange)}
-  .tc-edit-btn.del:hover{border-color:var(--red);color:var(--red)}
-  .wld-btn:hover{opacity:.85}
+  .tag-btn:hover{border-color:rgba(255,149,0,.45);color:rgba(255,149,0,.7)}
+  .seg-btn:hover{border-color:rgba(255,149,0,.4);color:rgba(255,149,0,.7)}
+  .rule-item:hover{border-color:rgba(255,255,255,.12)}
+  .partial-add-btn:hover{border-color:var(--orange);color:var(--orange)}
+  .btn-primary:hover{background:rgba(255,149,0,.07);box-shadow:0 0 16px rgba(255,149,0,.12),0 0 0 1px rgba(255,149,0,.15)}
 }
 </style>
 </head>
@@ -491,6 +515,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         </div>
         <div id="partialEntriesWrap"></div>
         <button class="partial-add-btn" onclick="addPartialEntry()">+ 분할진입 추가</button>
+        <div id="entryDateWrap" style="display:flex;gap:6px;align-items:center;margin-top:6px">
+          <div style="font-family:var(--mono);font-size:.6em;color:var(--text-3);letter-spacing:1px;white-space:nowrap">진입일시</div>
+          <input type="datetime-local" style="flex:1;height:40px;font-size:.75em;background:transparent;border:1px solid var(--border2);color:var(--text);border-radius:8px;outline:none;padding:0 10px;transition:all .2s" oninput="updatePE(0,'date',this.value)" id="pe-date-0">
+          <button class="now-btn" style="height:40px;font-size:.6em;padding:0 10px;flex-shrink:0" onclick="setNowPE(0)">NOW</button>
+        </div>
         <div class="partial-summary" id="entrySummary">
           <div class="partial-sum-item"><div class="partial-sum-label">평균단가</div><div class="partial-sum-val" id="sumEntryAvg">—</div></div>
           <div class="partial-sum-item"><div class="partial-sum-label">총 수량</div><div class="partial-sum-val gray" id="sumEntryQty">—</div></div>
@@ -562,16 +591,28 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         </div>
       </div>
 
-      <!-- 룰 체크리스트 -->
+      <!-- 룰 체크리스트 아코디언 -->
       <div class="fg">
         <label>룰 체크리스트</label>
-        <div class="rule-list" id="ruleList">
-          <div class="rule-item" onclick="toggleRule(this,0)"><div class="rule-cb">✓</div><div class="rule-text">큰 타임프레임 추세 확인</div></div>
-          <div class="rule-item" onclick="toggleRule(this,1)"><div class="rule-cb">✓</div><div class="rule-text">OB 또는 FVG 자리 확인</div></div>
-          <div class="rule-item" onclick="toggleRule(this,2)"><div class="rule-cb">✓</div><div class="rule-text">피보나치 78.6 / 88.6 확인</div></div>
-          <div class="rule-item" onclick="toggleRule(this,3)"><div class="rule-cb">✓</div><div class="rule-text">중첩 타점 2개 이상 확인</div></div>
-          <div class="rule-item" onclick="toggleRule(this,4)"><div class="rule-cb">✓</div><div class="rule-text">손절가 설정</div></div>
-          <div class="rule-item" onclick="toggleRule(this,5)"><div class="rule-cb">✓</div><div class="rule-text">진입 근거 작성</div></div>
+        <div class="rule-accordion" id="ruleAccordion">
+          <div class="rule-trigger" onclick="toggleRulePanel()">
+            <div class="rule-trigger-left">
+              <span class="rule-trigger-icon">☑</span>
+              <span class="rule-trigger-text">체크리스트 확인</span>
+              <span class="rule-trigger-badge" id="ruleBadge">0 / 6</span>
+            </div>
+            <span class="rule-arrow" id="ruleArrow">▼</span>
+          </div>
+          <div class="rule-panel" id="rulePanel" style="display:none">
+            <div class="rule-list" id="ruleList">
+              <div class="rule-item" onclick="toggleRule(this,0)"><div class="rule-cb">✓</div><div class="rule-text">큰 타임프레임 추세 확인</div></div>
+              <div class="rule-item" onclick="toggleRule(this,1)"><div class="rule-cb">✓</div><div class="rule-text">OB 또는 FVG 자리 확인</div></div>
+              <div class="rule-item" onclick="toggleRule(this,2)"><div class="rule-cb">✓</div><div class="rule-text">피보나치 78.6 / 88.6 확인</div></div>
+              <div class="rule-item" onclick="toggleRule(this,3)"><div class="rule-cb">✓</div><div class="rule-text">중첩 타점 2개 이상 확인</div></div>
+              <div class="rule-item" onclick="toggleRule(this,4)"><div class="rule-cb">✓</div><div class="rule-text">손절가 설정</div></div>
+              <div class="rule-item" onclick="toggleRule(this,5)"><div class="rule-cb">✓</div><div class="rule-text">진입 근거 작성</div></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -969,6 +1010,12 @@ function clearForm() {
   checkedRules = [];
   document.querySelectorAll('#tagsWrap .tag-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('#ruleList .rule-item').forEach(b => b.classList.remove('checked'));
+  const badge = document.getElementById('ruleBadge');
+  if (badge) { badge.textContent = '0 / 6'; badge.className = 'rule-trigger-badge'; }
+  const rulePanel = document.getElementById('rulePanel');
+  const ruleArrow = document.getElementById('ruleArrow');
+  if (rulePanel) rulePanel.style.display = 'none';
+  if (ruleArrow) ruleArrow.classList.remove('open');
 }
 
 // ── 세션 자동분류 (KST) ──
@@ -1068,22 +1115,26 @@ function renderPartialEntries() {
   if (!wrap) return;
   wrap.innerHTML = partialEntriesData.map((e, i) => `
     <div class="partial-row" id="pe-${i}">
-      <div class="partial-row-label">${i === 0 ? '1차' : i + '차'}</div>
+      <div class="partial-row-label">${i === 0 ? '1차' : (i + 1) + '차'}</div>
       <input class="partial-input" type="number" placeholder="진입가" inputmode="decimal"
         value="${e.price || ''}" oninput="updatePE(${i},'price',this.value)">
       <input class="partial-input" type="number" placeholder="수량" inputmode="decimal"
         value="${e.amount || ''}" oninput="updatePE(${i},'amount',this.value);syncEntryPct(${i})">
       <input class="partial-pct" type="number" placeholder="%" inputmode="decimal"
         value="${e.pct || ''}" oninput="syncEntryAmt(${i},this.value)">
-      ${i === 0
-        ? `<div style="display:flex;gap:4px;align-items:center">
-             <input type="datetime-local" style="height:44px;font-size:.72em;background:#0d0d0d;border:1px solid var(--border2);color:var(--text);border-radius:7px;outline:none;padding:0 6px;flex:1" value="${e.date||''}" oninput="updatePE(${i},'date',this.value)" id="pe-date-0">
-             <button class="now-btn" style="height:44px;font-size:.58em;padding:0 7px" onclick="setNowPE(0)">NOW</button>
-           </div>`
-        : `<input type="datetime-local" style="height:44px;font-size:.72em;background:#0d0d0d;border:1px solid var(--border2);color:var(--text);border-radius:7px;outline:none;padding:0 6px;width:100%" value="${e.date||''}" oninput="updatePE(${i},'date',this.value)" id="pe-date-${i}">`
-      }
       <button class="partial-del" onclick="removePE(${i})" ${i === 0 ? 'style="visibility:hidden"' : ''}>✕</button>
-    </div>`).join('');
+    </div>
+    ${i > 0 ? `<div class="partial-date-row">
+      <input type="datetime-local" style="flex:1;height:38px;font-size:.72em;background:transparent;border:1px solid var(--border2);color:var(--text);border-radius:7px;outline:none;padding:0 8px;transition:border-color .2s" value="${e.date||''}" oninput="updatePE(${i},'date',this.value)" id="pe-date-${i}">
+      <button class="now-btn" style="height:38px;font-size:.58em;padding:0 8px" onclick="setNowPE(${i})">NOW</button>
+    </div>` : ''}`).join('');
+
+  // 1차 진입 날짜 (별도 섹션)
+  const dateWrap = document.getElementById('entryDateWrap');
+  if (dateWrap) {
+    const d0 = partialEntriesData[0] || {};
+    dateWrap.querySelector('input').value = d0.date || '';
+  }
   updateEntrySummary();
 }
 
@@ -1252,12 +1303,37 @@ function toggleTag(btn, tag) {
   else          { selectedTags.push(tag);       btn.classList.add('active');    }
 }
 
+// ── RULE ACCORDION ──
+function toggleRulePanel() {
+  const panel = document.getElementById('rulePanel');
+  const arrow = document.getElementById('ruleArrow');
+  if (!panel) return;
+  const open = panel.style.display === 'none';
+  panel.style.display = open ? 'flex' : 'none';
+  if (arrow) arrow.classList.toggle('open', open);
+}
+
 // ── RULE CHECKLIST ──
 function toggleRule(el, idx) {
   el.classList.toggle('checked');
   const i = checkedRules.indexOf(idx);
   if (i >= 0) checkedRules.splice(i, 1);
   else        checkedRules.push(idx);
+  // 뱃지 업데이트
+  const badge = document.getElementById('ruleBadge');
+  if (badge) {
+    badge.textContent = checkedRules.length + ' / 6';
+    badge.className = 'rule-trigger-badge' + (checkedRules.length === 6 ? ' done' : '');
+  }
+  // 6개 모두 체크 시 자동 닫힘
+  if (checkedRules.length === 6) {
+    setTimeout(() => {
+      const panel = document.getElementById('rulePanel');
+      const arrow = document.getElementById('ruleArrow');
+      if (panel) panel.style.display = 'none';
+      if (arrow) arrow.classList.remove('open');
+    }, 400);
+  }
 }
 
 // ── 홀딩 기간 포맷 ──
