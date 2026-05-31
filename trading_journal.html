@@ -69,6 +69,44 @@ body.light-theme .edit-form{background:rgba(200,112,0,.03)}
 body.light-theme .bottom-nav{background:#f8f0e0;border-top-color:var(--border)}
 body.light-theme .modal-ov{background:rgba(40,25,10,.75)}
 
+/* ── GALAXY THEME ── */
+body.galaxy-theme{
+  --bg:#0d0d1a;--surface:#131325;--panel:#1a1a35;--panel2:#1f1f40;
+  --border:#2a2a4a;--border2:#333355;
+  --orange:#e8a87c;--orange2:#f0bc90;--orange-d:rgba(232,168,124,.13);
+  --green:#7eb8d4;--green-d:rgba(126,184,212,.12);
+  --red:#c97fa0;--red-d:rgba(201,127,160,.12);
+  --blue:#9db8e8;--blue-d:rgba(157,184,232,.12);
+  --gray-d:rgba(100,100,150,.1);
+  --text:#e8e8f5;--text-2:#9090b8;--text-3:#555577;
+}
+/* 갤럭시: 어두운 배경 요소들 재정의 */
+body.galaxy-theme #tickerBar{background:#080810;border-bottom-color:#1a1a30}
+body.galaxy-theme .fg input,
+body.galaxy-theme .fg select,
+body.galaxy-theme .fg textarea{background:#0a0a18}
+body.galaxy-theme .partial-input,
+body.galaxy-theme .partial-pct,
+body.galaxy-theme .partial-type{background:#0a0a18}
+body.galaxy-theme .buy-input{background:#0a0a18}
+body.galaxy-theme .ls-btn,
+body.galaxy-theme .coin-trigger,
+body.galaxy-theme .coin-add-input{background:#0a0a18}
+body.galaxy-theme .coin-dd{background:#1a1a35}
+body.galaxy-theme .coin-opt{background:#1a1a35;border-bottom-color:var(--border)}
+body.galaxy-theme .coin-opt:hover{background:var(--orange-d)}
+body.galaxy-theme .review-area{background:#0a0a18}
+body.galaxy-theme .search-input,
+body.galaxy-theme .sort-sel{background:#131325}
+body.galaxy-theme .rule-trigger,
+body.galaxy-theme .rule-item{background:#0a0a18}
+body.galaxy-theme .tag-btn,
+body.galaxy-theme .seg-btn{background:#0a0a18}
+body.galaxy-theme .wld-btn{background:#0a0a18}
+body.galaxy-theme .edit-form{background:rgba(157,184,232,.03)}
+body.galaxy-theme .bottom-nav{background:#131325;border-top-color:var(--border)}
+body.galaxy-theme .modal-ov{background:rgba(5,5,20,.92)}
+
 /* ══════════════════════════════════════════
    2. LAYOUT & SHELL
    ══════════════════════════════════════════ */
@@ -1010,6 +1048,9 @@ body.nav-right .bottom-nav .nav-btn{font-size:.5em;padding:12px 4px}
           <button class="sopt" id="sopt-light"  onclick="setTheme('light')">☀️ 라이트</button>
           <button class="sopt" id="sopt-system" onclick="setTheme('system')">💻 시스템</button>
         </div>
+        <div class="settings-opts" style="margin-top:6px">
+          <button class="sopt" id="sopt-galaxy" onclick="setTheme('galaxy')">✨ 갤럭시</button>
+        </div>
       </div>
       <div class="settings-row">
         <div class="settings-label">메뉴 위치</div>
@@ -1105,7 +1146,7 @@ function openSettings() {
 function updateSettingsUI() {
   const theme  = localStorage.getItem('mj_theme')  || 'dark';
   const navPos = localStorage.getItem('mj_navpos') || 'bottom';
-  ['dark','light','system'].forEach(t => document.getElementById('sopt-'+t)?.classList.toggle('active', t===theme));
+  ['dark','light','system','galaxy'].forEach(t => document.getElementById('sopt-'+t)?.classList.toggle('active', t===theme));
   ['bottom','top','left','right'].forEach(p => document.getElementById('sopt-nav-'+p)?.classList.toggle('active', p===navPos));
   const zoomEl = document.getElementById('zoomToggle');
   if (zoomEl) zoomEl.checked = localStorage.getItem('mj_zoom') === '1';
@@ -1117,8 +1158,9 @@ function setTheme(theme) {
 }
 function applyTheme(theme) {
   const body = document.body;
-  body.classList.remove('light-theme');
+  body.classList.remove('light-theme','galaxy-theme');
   if (theme === 'light') body.classList.add('light-theme');
+  else if (theme === 'galaxy') body.classList.add('galaxy-theme');
   else if (theme === 'system') {
     if (window.matchMedia('(prefers-color-scheme: light)').matches) body.classList.add('light-theme');
   }
