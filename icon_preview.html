@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Icon Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+body{background:#1a1a1a;display:flex;gap:30px;padding:40px;font-family:monospace;align-items:flex-start}
+.item{display:flex;flex-direction:column;align-items:center;gap:10px}
+canvas{border-radius:22%;box-shadow:0 6px 30px rgba(0,0,0,.9)}
+.label{color:#666;font-size:11px;letter-spacing:1px}
+</style>
+</head>
+<body>
+<script>
+function candle(ctx, cx, wickT, bodyT, bodyB, wickB, w, col) {
+  ctx.shadowColor = col; ctx.shadowBlur = 14;
+  ctx.strokeStyle = col; ctx.lineWidth = Math.max(2, w*0.13); ctx.lineCap = 'square';
+  ctx.beginPath(); ctx.moveTo(cx, wickT); ctx.lineTo(cx, bodyT); ctx.stroke();
+  ctx.fillStyle = col;
+  ctx.fillRect(cx-w/2, bodyT, w, bodyB-bodyT);
+  ctx.beginPath(); ctx.moveTo(cx, bodyB); ctx.lineTo(cx, wickB); ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+function draw(ctx, S) {
+  // 배경
+  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,S,S);
+  // 상단 라인
+  ctx.fillStyle = '#ff9500'; ctx.fillRect(0,0,S,S*0.01);
+
+  // 캔들
+  const pad=S*0.1, bot=S*0.76, h=S*0.58;
+  const cw = S*0.074;
+  const xs = [0,1,2,3,4,5].map(i => pad + i*(S*0.135) + cw/2 + S*0.01);
+  const data = [
+    [0.82,0.75,0.38,0.22,'#ff453a'],
+    [0.90,0.80,0.52,0.40,'#ff453a'],
+    [0.96,0.90,0.70,0.62,'#ff9500'],
+    [0.88,0.72,0.35,0.20,'#32d74b'],
+    [0.95,0.88,0.55,0.42,'#32d74b'],
+    [1.00,0.94,0.62,0.50,'#32d74b'],
+  ];
+  data.forEach(([wt,bt,bb,wb,col],i) => {
+    const y0 = bot-h;
+    candle(ctx, xs[i], y0+h*(1-wt), y0+h*(1-bt), y0+h*(1-bb), y0+h*(1-wb), cw, col);
+  });
+
+  // 오렌지 하단 바
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#ff9500';
+  ctx.fillRect(0, S*0.82, S, S*0.18);
+  ctx.fillStyle = '#000';
+  ctx.font = `bold ${S*0.09}px IBM Plex Mono,monospace`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('TRADE LOG', S/2, S*0.91);
+}
+
+function make(label, size) {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = size;
+  draw(cv.getContext('2d'), size);
+  const wrap = document.createElement('div');
+  wrap.className = 'item';
+  const lbl = document.createElement('div');
+  lbl.className = 'label';
+  lbl.textContent = label;
+  wrap.appendChild(cv); wrap.appendChild(lbl);
+  document.body.appendChild(wrap);
+}
+
+make('512px', 512);
+make('180px (실제 홈화면)', 180);
+</script>
+</body>
+</html>

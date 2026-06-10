@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "trade-log-preview",
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": ["/Users/dubu/Documents/Claude_Project/TRADE_LOG/server.js"],
+      "port": 7788
+    }
+  ]
+}
